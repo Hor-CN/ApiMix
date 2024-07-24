@@ -1,0 +1,32 @@
+# 网关端口
+server:
+  port: 2786
+
+spring:
+  application:
+    name: apimix-consumer
+  cloud:
+    gateway:
+      routes:
+        - id: backend_router
+          uri: http://127.0.0.1:8091
+          predicates:
+            - Path=/api/**
+
+dubbo:
+  registry:
+    address: nacos://127.0.0.1:8848
+  application:
+    name: apimix-consumer
+
+
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: info
+
