@@ -24,6 +24,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class VerifyParamFilter implements Ordered, GlobalFilter {
 
+
+    private final static String TOKEN = "Token";
+
+
     @DubboReference
     private IUserInterfaceInvokeService invokeService;
 
@@ -33,8 +37,8 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
         ServerHttpRequest request = exchange.getRequest();
         // 请求头
         HttpHeaders headers = request.getHeaders();
-        // Token信息
-        String token = headers.getFirst("Token");
+        // 获取Token信息
+        String token = headers.getFirst(TOKEN);
         // 请求头中参数必须完整
         if (token == null) {
             throw new BusinessException(403, "Token不能为空");

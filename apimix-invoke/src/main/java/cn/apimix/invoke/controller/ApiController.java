@@ -35,16 +35,12 @@ public class ApiController {
         requestParams.getQuery().forEach((field -> query.put(field.getName(), field.getValue().toString())));
 
 
-        log.info("被调用");
+        log.info(requestParams.toString());
 
 
         // 请求头
         Map<String, String> headers = MapUtil.newHashMap();
-        requestParams.getHeader().forEach(field ->
-        {
-            headers.put(field.getName(), field.getValue().toString());
-        });
-
+        requestParams.getHeader().forEach(field -> headers.put(field.getName(), field.getValue().toString()));
 
         // 请求体
         Map<String, Object> body = MapUtil.newHashMap();
