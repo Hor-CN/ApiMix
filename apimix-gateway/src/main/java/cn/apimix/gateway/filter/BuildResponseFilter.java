@@ -7,6 +7,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.factory.rewrite.ModifyResponseBodyGatewayFilterFactory;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -30,14 +31,15 @@ public class BuildResponseFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // 构建调用请求
         return responseBodyGatewayFilterFactory
                 .apply(new ModifyResponseBodyGatewayFilterFactory.Config()
-                        .setRewriteFunction(Object.class, Object.class, responseRewriteService))
+                        .setRewriteFunction(byte[].class, byte[].class, responseRewriteService))
                 .filter(exchange, chain);
     }
 
     @Override
     public int getOrder() {
-        return 3;
+        return -2;
     }
 }

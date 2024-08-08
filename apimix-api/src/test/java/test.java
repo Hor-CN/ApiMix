@@ -1,7 +1,11 @@
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
+
+import java.util.Date;
 
 /**
  * @Author: Hor
@@ -11,7 +15,10 @@ import cn.hutool.crypto.symmetric.SymmetricCrypto;
 public class test {
     public static void main(String[] args) {
 
-        System.out.println(DateUtil.offsetDay(DateUtil.date(), 30));
+        Date dateTime = DateUtil.parseDate("2024-07-26 17:52:08");
+
+        System.out.println(dateTime.getTime());
+//        System.out.println(DateUtil.offsetDay(DateUtil.date(), 30));
 //        String content = "test中文";
 //        byte[] key = SecureUtil.generateKey(SymmetricAlgorithm.DESede.getValue()).getEncoded();
 //        SymmetricCrypto des = new SymmetricCrypto(SymmetricAlgorithm.DESede, key);

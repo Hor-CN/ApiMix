@@ -1,14 +1,19 @@
 package cn.apimix.gateway.service;
 
+import cn.apimix.common.model.InterfaceInfo;
+import cn.apimix.common.service.InnerInterfaceService;
 import cn.apimix.gateway.model.ApiParamField;
 import cn.apimix.gateway.model.ApiParamTypeEnum;
 import cn.apimix.gateway.model.RequestParams;
+import cn.apimix.gateway.utils.NetUtils;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.factory.rewrite.RewriteFunction;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -25,15 +30,25 @@ import java.util.List;
 @Service
 @Slf4j
 public class RequestRewriteService implements RewriteFunction<byte[], byte[]> {
+
+
+    @DubboReference
+    private InnerInterfaceService innerInterfaceService;
+
+
     @Override
     public Publisher<byte[]> apply(ServerWebExchange exchange, byte[] body) {
-
         ServerHttpRequest request = exchange.getRequest();
+
+        // 请求的接口ID
+        Long apiId = NetUtils.convertApiId(request);
+
+        InterfaceInfo interfaceInfo = innerInterfaceService.getInterfaceInfo(apiId);
 
         // 构建请求参数
         RequestParams requestParams = RequestParams.builder()
                 //http://api.yujn.cn/api/zzxjj.php?type=video
-                .url("http://api.yujn.cn/api/zzxjj.php")
+                .url(interfaceInfo.getUrl())
                 // 请求方式
                 .method(request.getMethodValue()).build();
         List<ApiParamField> querys = new ArrayList<>();

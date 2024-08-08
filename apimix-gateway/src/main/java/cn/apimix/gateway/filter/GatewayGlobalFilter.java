@@ -29,6 +29,10 @@ public class GatewayGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+
+        log.info("GatewayGlobalFilter：成功");
+
         // 日志记录
         ServerHttpRequest request = exchange.getRequest();
         log.info("======请求日志(ID:{})开始======", request.getId());

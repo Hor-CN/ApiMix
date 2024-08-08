@@ -3,6 +3,8 @@ package cn.apimix.gateway.service;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.factory.rewrite.RewriteFunction;
+import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,7 @@ import reactor.core.publisher.Mono;
  */
 @Service
 @Slf4j
-public class ResponseRewriteService implements RewriteFunction<Object, Object> {
+public class ResponseRewriteService implements RewriteFunction<byte[], byte[]> {
     /**
      * Applies this function to the given arguments.
      *
@@ -25,7 +27,7 @@ public class ResponseRewriteService implements RewriteFunction<Object, Object> {
      * @return the function result
      */
     @Override
-    public Publisher<Object> apply(ServerWebExchange serverWebExchange, Object bytes) {
+    public Publisher<byte[]> apply(ServerWebExchange serverWebExchange, byte[] bytes) {
         try {
             ServerHttpRequest request = serverWebExchange.getRequest();
             ServerHttpResponse response = serverWebExchange.getResponse();
@@ -38,6 +40,10 @@ public class ResponseRewriteService implements RewriteFunction<Object, Object> {
             // 添加请求日志ID
             serverWebExchange.getResponse().getHeaders()
                     .add("ApiMix-Id",request.getId());
+
+
+            //todo： 使用流量包，添加次数
+
 
             return Mono.just(bytes);
         }catch (Exception e) {

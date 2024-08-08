@@ -40,11 +40,9 @@ public class BuildRequestFilter implements GlobalFilter, Ordered {
                 .filter(exchange, chain);
     }
 
-
     @Override
     public int getOrder() {
-        return 1;
+        return 10;
     }
-
 
 }

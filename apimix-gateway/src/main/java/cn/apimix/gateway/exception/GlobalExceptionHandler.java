@@ -39,6 +39,12 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
         DataBufferFactory bufferFactory = response.bufferFactory();
         response.setStatusCode(HttpStatus.FORBIDDEN);
         Result<Object> error = Result.buildFail(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+        if (ex instanceof BusinessException) {
+            BusinessException businessException = (BusinessException) ex;
+            response.setStatusCode(HttpStatus.valueOf(businessException.getCode()));
+            error = Result.buildFail(businessException.getCode(), ex.getMessage());
+        }
+
         log.error("【网关异常】：{}", ex.getMessage());
         try {
             byte[] errorBytes = objectMapper.writeValueAsBytes(error);

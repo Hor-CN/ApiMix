@@ -20,11 +20,4 @@ public class ApiMixGateWayApplication {
         SpringApplication.run(ApiMixGateWayApplication.class, args);
     }
 
-//    @Bean
-//    public RouteLocator customRouterLocator(RouteLocatorBuilder builder) {
-//        return builder.routes()
-//                .route("api",r -> r.path("/")
-//                        .uri("https://api.aa1.cn"))
-//                .build();
-//    }
 }

@@ -1,11 +1,16 @@
 package cn.apimix.provider;
 
-import cn.apimix.common.service.IUserInterfaceInvokeService;
+import cn.apimix.common.model.InterfaceInfo;
+import cn.apimix.common.model.InterfaceToken;
+import cn.apimix.common.model.InterfaceUser;
+import cn.apimix.common.service.InnerInterfaceService;
 import cn.apimix.model.entity.ApiInfo;
+import cn.apimix.model.entity.User;
 import cn.apimix.model.entity.UserApiRelation;
 import cn.apimix.model.entity.UserToken;
 import cn.apimix.service.impl.ApiServiceImpl;
 import cn.apimix.service.impl.UserApiRelationServiceImpl;
+import cn.apimix.service.impl.UserServiceImpl;
 import cn.apimix.service.impl.UserTokenServiceImpl;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Component;
@@ -19,7 +24,7 @@ import javax.annotation.Resource;
  */
 @Component
 @DubboService
-public class UserInterfaceInvokeServiceImpl implements IUserInterfaceInvokeService {
+public class InnerInterfaceServiceImpl implements InnerInterfaceService {
 
     @Resource
     private ApiServiceImpl apiService;
@@ -27,12 +32,11 @@ public class UserInterfaceInvokeServiceImpl implements IUserInterfaceInvokeServi
     @Resource
     private UserTokenServiceImpl tokenService;
 
+    @Resource
+    private UserServiceImpl userService;
 
     @Resource
     private UserApiRelationServiceImpl relationService;
-
-
-//    private
 
     /**
      * 接口调用
@@ -96,4 +100,70 @@ public class UserInterfaceInvokeServiceImpl implements IUserInterfaceInvokeServi
 
         return true;
     }
+
+    /**
+     * 获取调用用户信息
+     *
+     * @param userId 用户id
+     * @return 用户信息
+     */
+    @Override
+    public InterfaceUser getUserByUserId(Long userId) {
+        User user = userService.selectUserById(userId);
+        return InterfaceUser.builder()
+                .id(user.getId())
+                .avatar(user.getAvatar())
+                .username(user.getUserName())
+                .nickname(user.getNickName())
+                .status(user.getStatus())
+                .createTime(user.getCreateTime())
+                .updateTime(user.getUpdateTime())
+                .build();
+    }
+
+    /**
+     * 获取Token信息
+     *
+     * @param tokenValue token值
+     * @return token信息
+     */
+    @Override
+    public InterfaceToken getTokenByTokenValue(String tokenValue) {
+        UserToken userToken = tokenService.selectTokenByTokenValue(tokenValue);
+        return InterfaceToken.builder()
+                .id(userToken.getUserId())
+                .userId(userToken.getUserId())
+                .tokenValue(userToken.getTokenValue())
+                .expired(userToken.getExpired())
+                .remark(userToken.getRemark())
+                .createTime(userToken.getCreateTime())
+                .updateTime(userToken.getUpdateTime())
+                .build();
+    }
+
+    /**
+     * 获取接口信息
+     *
+     * @param apiId 接口id
+     * @return 接口信息
+     */
+    @Override
+    public InterfaceInfo getInterfaceInfo(Long apiId) {
+        ApiInfo apiInfo = apiService.getById(apiId);
+
+        return InterfaceInfo.builder()
+                .id(apiInfo.getId())
+                .userId(apiInfo.getUserId())
+                .name(apiInfo.getName())
+                .url(apiInfo.getUrl())
+                .proxy(apiInfo.getProxy())
+                .isPaid(apiInfo.getIsPaid())
+                .method(apiInfo.getMethod())
+                .status(apiInfo.getStatus())
+                .createTime(apiInfo.getCreateTime())
+                .updateTime(apiInfo.getUpdateTime())
+                .build();
+    }
+
+
 }

@@ -29,6 +29,6 @@ public class RequestFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return 2;
+        return -98;
     }
 }

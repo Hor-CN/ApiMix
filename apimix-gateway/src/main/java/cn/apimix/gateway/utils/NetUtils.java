@@ -1,14 +1,14 @@
 package cn.apimix.gateway.utils;
 
 
+import cn.apimix.gateway.exception.BusinessException;
+import cn.hutool.core.convert.Convert;
 import org.bouncycastle.util.Strings;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import reactor.core.publisher.Flux;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.core.io.buffer.DataBufferUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -88,5 +88,13 @@ public class NetUtils {
         return getBody.get();
     }
 
+
+    public static Long convertApiId(ServerHttpRequest request) {
+        try {
+            return Convert.toLong(request.getPath().value().split("/")[2]);
+        } catch (Exception e) {
+            throw new BusinessException(404, "接口不存在");
+        }
+    }
 
 }

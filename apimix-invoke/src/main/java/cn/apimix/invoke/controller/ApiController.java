@@ -27,16 +27,15 @@ import java.util.Map;
 @RequestMapping("/api")
 public class ApiController {
 
-    @RequestMapping()
+    @RequestMapping("/*")
     public ResponseEntity<Object> invokingApi(@RequestBody RequestParams requestParams) {
+
+
+        log.info("请求参数：{}", requestParams);
 
         // 请求参数
         Map<String, Object> query = MapUtil.newHashMap();
         requestParams.getQuery().forEach((field -> query.put(field.getName(), field.getValue().toString())));
-
-
-        log.info(requestParams.toString());
-
 
         // 请求头
         Map<String, String> headers = MapUtil.newHashMap();

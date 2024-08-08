@@ -96,7 +96,6 @@ public class UserVo {
      */
     private Date createTime;
 
-
     /**
      * 更新时间
      */

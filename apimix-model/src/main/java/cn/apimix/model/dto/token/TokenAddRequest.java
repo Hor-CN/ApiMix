@@ -3,6 +3,8 @@ package cn.apimix.model.dto.token;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Token 添加请求
@@ -17,7 +19,7 @@ public class TokenAddRequest implements Serializable {
     /**
      * 过期时间（时间戳）
      */
-    private Long expired = -1L;
+    private LocalDateTime expired;
 
     /**
      * remark 备注

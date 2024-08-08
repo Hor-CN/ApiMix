@@ -1,35 +1,22 @@
-package cn.apimix.model.entity;
+package cn.apimix.common.model;
 
-import com.mybatisflex.annotation.Id;
-import com.mybatisflex.annotation.KeyType;
-import com.mybatisflex.annotation.Table;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- * 用户Token实体
- *
  * @Author: Hor
- * @Date: 2024/5/20 19:43
+ * @Date: 2024/7/25 下午4:54
  * @Version: 1.0
  */
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(value = "user_token")
-public class UserToken implements Serializable {
+public class InterfaceToken implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键
-     */
-    @Id(keyType = KeyType.Auto)
     private Long id;
 
     /**
@@ -41,7 +28,7 @@ public class UserToken implements Serializable {
      * Token 值
      */
     private String tokenValue;
-    
+
     /**
      * remark 备注
      */

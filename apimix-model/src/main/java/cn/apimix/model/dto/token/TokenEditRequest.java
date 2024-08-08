@@ -3,6 +3,8 @@ package cn.apimix.model.dto.token;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 修改 Token 请求
@@ -23,7 +25,7 @@ public class TokenEditRequest implements Serializable {
     /**
      * 过期时间
      */
-    private Long expired;
+    private LocalDateTime expired;
 
     /**
      * remark 备注
