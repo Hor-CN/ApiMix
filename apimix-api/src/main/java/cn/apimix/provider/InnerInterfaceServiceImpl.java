@@ -6,10 +6,10 @@ import cn.apimix.common.model.InterfaceUser;
 import cn.apimix.common.service.InnerInterfaceService;
 import cn.apimix.model.entity.*;
 import cn.apimix.service.impl.*;
-import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -51,57 +51,32 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
      * @param token 调用此接口的Token
      * @return boolean 扣费结果
      */
+    @Transactional
     @Override
     public Boolean invoke(Long apiId, String token) {
-        /* 判断此token是否分配到此api上
-            有则附带扣除分配的次数
-                判断是否收限制
-            无则直接去扣除总调用次数
-         */
+
         ApiInfo apiInfo = apiService.getById(apiId);
-
-        if (!apiInfo.getProxy()) {
-            return false;
-        }
-
+        // 如果不收费，直接调用成功
         if (!apiInfo.getIsPaid()) {
-            return false;
+            return true;
         }
-
 
         // 根据 Token 获取信息
         UserToken userToken = tokenService.selectTokenByTokenValue(token);
-        // Token 过期判断
 
-        // 判断接口是否被用户申请
-        Long userId = userToken.getUserId();
+        // 根据条件使用最适合的流量包【0】
+        List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userToken.getUserId());
+        // 添加套餐的使用次数
+        Boolean packageIncrease = userPackageService.increaseTheNumberOfCalls(availablePackages.get(0).getId());
 
-        Boolean userApiRelationExist = relationService.isUserApiRelationExist(apiId, userId);
-        // 尚未购买该 API 或 API 调用次数已用完
-        if (!userApiRelationExist) {
-            return false;
-        }
-        UserApiRelation userApiRelation = relationService.selectApiRelation(apiId, userId);
-        // 禁用调用
-        if (!userApiRelation.getStatus()) {
-            return false;
-        }
-        // 没有调用次数了
-        if (userApiRelation.getTotalQuota() <= userApiRelation.getUsedQuota()) {
-            return false;
+        ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
+        // 分配的token统计增加
+        Boolean apiTokenIncrease = true;
+        if (apiToken != null) {
+            apiTokenIncrease = apiTokenService.increaseTheNumberOfCalls(apiToken.getTokenId());
         }
 
-
-        // todo 判断token是否有分配到该接口
-
-        // 使用流量包
-        // 1. 根据过期时间使用最短的流量包
-        // 2. 使用添加used_quota次数并将用户调用情况表的次数加一
-
-        // 获取最先过期的流量包
-
-
-        return true;
+        return packageIncrease && apiTokenIncrease;
     }
 
     /**
@@ -181,10 +156,25 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
         UserToken userToken = tokenService.selectTokenByTokenValue(token);
         // 根据 接口ID 获取信息
         ApiInfo apiInfo = apiService.getById(apiId);
+
         // 未代理接口无法调用
         if (!apiInfo.getProxy()) {
             return false;
         }
+
+        // 如果不收费
+        if (!apiInfo.getIsPaid()) {
+            return true;
+        }
+
+        // 判断接口是否被用户申请
+        Long userId = userToken.getUserId();
+        Boolean userApiRelationExist = relationService.isUserApiRelationExist(apiId, userId);
+        // 尚未购买该 API
+        if (!userApiRelationExist) {
+            return false;
+        }
+
         // 1. 判断Token是否有分配到此接口，有则判断此token在此接口上的限制次数
         ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
         // 未分配，没有可用次数返回false
@@ -192,8 +182,14 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
             return false;
         }
 
+        UserApiRelation userApiRelation = relationService.selectApiRelation(apiId, userId);
+        // 禁用调用
+        if (!userApiRelation.getStatus()) {
+            return false;
+        }
+
         // 获取可用套餐
-        List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userToken.getUserId());
+        List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userId);
 
         return !availablePackages.isEmpty();
 

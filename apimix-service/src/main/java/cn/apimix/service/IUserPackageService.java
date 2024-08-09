@@ -28,4 +28,13 @@ public interface IUserPackageService extends IService<UserPackage> {
      */
     List<UserPackage> getAvailablePackages(Long apiId,Long userId);
 
+
+    /**
+     * 增加调用次数
+     *
+     * @param id 套餐id
+     * @return 结果
+     */
+    Boolean increaseTheNumberOfCalls(Long id);
+
 }

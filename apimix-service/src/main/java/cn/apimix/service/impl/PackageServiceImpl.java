@@ -15,6 +15,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -136,6 +137,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, Package> impl
      * @param userId    用户ID
      * @param count     购买数量
      */
+    @Transactional
     @Override
     public Boolean purchasePackage(Long packageId, Long userId, Integer count) {
         // 获取套餐详细
@@ -183,7 +185,6 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, Package> impl
         // 请求次数
         Long totalQuota = packageInfo.getQuota() * count;
 
-
         // 在用户购买套餐表中添加
         userPackageService.save(UserPackage.builder()
                 .userId(userId)
@@ -195,20 +196,20 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, Package> impl
                 .status(0)
                 .expiredTime(expiredTime)
                 .build());
-        // 在用户调用接口关系表user_api_relation中添加
-        UserApiRelation userApiRelation = userApiRelationService.getOne(query().where(
-                UserApiRelationTableDef.USER_API_RELATION.API_ID.eq(packageInfo.getApiId())
-                        .and(UserApiRelationTableDef.USER_API_RELATION.USER_ID.eq(userId))
-        ));
 
-        if (userApiRelation != null) {
-            totalQuota = userApiRelation.getTotalQuota() + totalQuota;
-        }
+//        // 在用户调用接口关系表user_api_relation中添加
+//        UserApiRelation userApiRelation = userApiRelationService.getOne(query().where(
+//                UserApiRelationTableDef.USER_API_RELATION.API_ID.eq(packageInfo.getApiId())
+//                        .and(UserApiRelationTableDef.USER_API_RELATION.USER_ID.eq(userId))
+//        ));
+
+//        if (userApiRelation != null) {
+//            totalQuota = userApiRelation.getTotalQuota() + totalQuota;
+//        }
 
         return userApiRelationService.save(UserApiRelation.builder()
                 .userId(userId)
                 .apiId(packageInfo.getApiId())
-                .totalQuota(totalQuota)
                 .build());
     }
 

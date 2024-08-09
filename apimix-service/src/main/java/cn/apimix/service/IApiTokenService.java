@@ -12,4 +12,6 @@ public interface IApiTokenService extends IService<ApiToken> {
 
     ApiToken getApiTokenByTokenIdAndApiId(Long tokenId,Long apiId);
 
+
+    Boolean increaseTheNumberOfCalls(Long id);
 }

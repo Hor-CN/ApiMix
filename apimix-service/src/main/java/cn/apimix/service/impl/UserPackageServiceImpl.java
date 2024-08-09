@@ -5,10 +5,12 @@ import cn.apimix.model.entity.UserPackage;
 import cn.apimix.model.entity.table.UserPackageTableDef;
 import cn.apimix.service.IUserPackageService;
 import com.mybatisflex.core.query.QueryMethods;
+import com.mybatisflex.core.update.UpdateChain;
+import com.mybatisflex.core.update.UpdateWrapper;
+import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,6 +59,19 @@ public class UserPackageServiceImpl extends ServiceImpl<UserPackageMapper, UserP
         );
     }
 
+    /**
+     * 增加套餐调用次数
+     *
+     * @param id 套餐id
+     * @return 结果
+     */
+    @Override
+    public Boolean increaseTheNumberOfCalls(Long id) {
+        return UpdateChain.of(UserPackage.class)
+                .setRaw(UserPackage::getUsedQuota, "used_quota + 1")
+                .where(UserPackage::getId).eq(id)
+                .update();
+    }
 
 
 }

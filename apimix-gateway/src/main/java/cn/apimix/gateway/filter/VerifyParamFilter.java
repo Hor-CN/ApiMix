@@ -32,9 +32,6 @@ import java.time.ZoneOffset;
 public class VerifyParamFilter implements Ordered, GlobalFilter {
 
 
-    private final static String TOKEN = "X-APIMix-Token";
-
-
     @DubboReference
     private InnerInterfaceService innerInterfaceService;
 
@@ -45,7 +42,7 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
         // 请求头
         HttpHeaders headers = request.getHeaders();
         // 获取Token信息
-        String token = headers.getFirst(TOKEN);
+        String token = headers.getFirst("X-APIMix-Token");
         // 请求头中参数必须完整
         if (token == null) {
             throw new BusinessException(403, "Token不能为空");
