@@ -9,6 +9,7 @@ import cn.apimix.model.entity.table.UserApiRelationTableDef;
 import cn.apimix.model.entity.table.UserPackageTableDef;
 import cn.apimix.model.vo.api.SkuVo;
 import cn.apimix.service.IPackageService;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import com.mybatisflex.core.paginate.Page;
@@ -193,7 +194,6 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, Package> impl
                 .apiId(packageInfo.getApiId())
                 .count(count)
                 .usedQuota(0L)
-                .status(0)
                 .expiredTime(expiredTime)
                 .build());
 
@@ -218,10 +218,23 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, Package> impl
      * 获取该用户的某接口的流量包
      */
     public Page<UserPackage> getUserPackageList(PageRequest pageRequest, Long userId, Long apiId) {
-        return userPackageService.getMapper().paginateWithRelations(
+        Page<UserPackage> userPackagePage = userPackageService.getMapper().paginateWithRelations(
                 pageRequest.getPageNumber(), pageRequest.getPageSize(),
                 query().where(UserPackageTableDef.USER_PACKAGE.USER_ID.eq(userId)).and(UserPackageTableDef.USER_PACKAGE.API_ID.eq(apiId))
         );
+        userPackagePage.getRecords().forEach(data -> {
+            if (data.getUsedQuota() == 0) {
+                data.setStatus(0);
+            } else if (data.getUsedQuota() > 0 && data.getUsedQuota() < data.getTotalQuota()) {
+                data.setStatus(1);
+            } else if (data.getTotalQuota().equals(data.getUsedQuota())) {
+                data.setStatus(2);
+            }
+            if (data.getExpiredTime().before(DateTime.now())) {
+                data.setStatus(3);
+            }
+        });
+        return userPackagePage;
     }
 
 }

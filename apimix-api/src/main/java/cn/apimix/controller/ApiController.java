@@ -47,6 +47,9 @@ public class ApiController {
     @Resource
     private PackageServiceImpl packageService;
 
+    @Resource
+    private UserPackageServiceImpl userPackageService;
+
     /**
      * 添加接口。
      *
@@ -198,7 +201,9 @@ public class ApiController {
     public Page<ApiRelationVo> getShopList(@Valid PageRequest request) {
         // 获取当前用户ID
         Long userId = StpUtil.getLoginIdAsLong();
-        return userApiRelationService.selectUserApiRelationByPage(request, userId);
+        Page<ApiRelationVo> apiRelationVoPage = userApiRelationService.selectUserApiRelationByPage(request, userId);
+        apiRelationVoPage.getRecords().forEach(data -> data.setQuota(userPackageService.getQuota(data.getUserId(),data.getApiId())));
+        return apiRelationVoPage;
     }
 
     /**

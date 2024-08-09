@@ -1,7 +1,6 @@
 package cn.apimix.model.vo.api;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Date;
 
@@ -10,8 +9,8 @@ import java.util.Date;
  * @Date: 2024/6/24 下午7:59
  * @Version: 1.0
  */
-@Data
-@Builder
+@Setter
+@Getter
 public class ApiRelationVo {
 
     private Long id;
@@ -26,15 +25,8 @@ public class ApiRelationVo {
      */
     private Long apiId;
 
-    /**
-     * 总调用次数(总额度，包括所有的套餐)
-     */
-    private Long totalQuota;
 
-    /**
-     * 已调用次数(已用额度)
-     */
-    private Long usedQuota;
+    private Quota quota;
 
     /**
      * 1-正常，0-禁用
@@ -64,5 +56,17 @@ public class ApiRelationVo {
      */
     private String logo;
 
+    public ApiRelationVo(Long id, Long userId, Long apiId, Boolean status, Date createTime, Date updateTime, String name, String logo) {
+        this.id = id;
+        this.userId = userId;
+        this.apiId = apiId;
+        this.status = status;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.name = name;
+        this.logo = logo;
+    }
+
 
 }
+

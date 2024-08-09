@@ -43,16 +43,6 @@ public class UserApiRelation implements Serializable {
     private Long apiId;
 
     /**
-     * 总调用次数(总额度，包括所有的套餐)
-     */
-    private Long totalQuota;
-
-    /**
-     * 已调用次数(已用额度)
-     */
-    private Long usedQuota;
-
-    /**
      * 1-正常，0-禁用
      */
     private Boolean status;

@@ -1,9 +1,6 @@
 package cn.apimix.model.entity;
 
-import com.mybatisflex.annotation.Id;
-import com.mybatisflex.annotation.KeyType;
-import com.mybatisflex.annotation.RelationOneToOne;
-import com.mybatisflex.annotation.Table;
+import com.mybatisflex.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -71,6 +68,7 @@ public class UserPackage implements Serializable {
     /**
      * 套餐状态（0：未使用 1：使用中，2：已用完，3：过期）
      */
+    @Column(ignore = true)
     private Integer status;
 
     /**

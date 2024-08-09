@@ -1,6 +1,7 @@
 package cn.apimix.service;
 
 import cn.apimix.model.entity.UserPackage;
+import cn.apimix.model.vo.api.Quota;
 import com.mybatisflex.core.service.IService;
 
 import java.util.List;
@@ -36,5 +37,16 @@ public interface IUserPackageService extends IService<UserPackage> {
      * @return 结果
      */
     Boolean increaseTheNumberOfCalls(Long id);
+
+
+    /**
+     * 获取次数详情
+     *
+     * @param userId 用户id
+     * @param apiId 接口id
+     * @return quota
+     */
+    Quota getQuota(Long userId,Long apiId);
+
 
 }

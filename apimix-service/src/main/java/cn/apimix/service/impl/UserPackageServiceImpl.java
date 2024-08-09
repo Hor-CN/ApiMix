@@ -3,7 +3,10 @@ package cn.apimix.service.impl;
 import cn.apimix.mapper.UserPackageMapper;
 import cn.apimix.model.entity.UserPackage;
 import cn.apimix.model.entity.table.UserPackageTableDef;
+import cn.apimix.model.vo.api.Quota;
 import cn.apimix.service.IUserPackageService;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.mybatisflex.core.query.QueryMethods;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.core.update.UpdateWrapper;
@@ -71,6 +74,31 @@ public class UserPackageServiceImpl extends ServiceImpl<UserPackageMapper, UserP
                 .setRaw(UserPackage::getUsedQuota, "used_quota + 1")
                 .where(UserPackage::getId).eq(id)
                 .update();
+    }
+
+    /**
+     * 获取次数详情
+     *
+     * @param userId 用户id
+     * @param apiId  接口id
+     * @return quota
+     */
+    @Override
+    public Quota getQuota(Long userId, Long apiId) {
+        List<UserPackage> list = list(query().where(UserPackageTableDef.USER_PACKAGE.USER_ID.eq(userId))
+                .and(UserPackageTableDef.USER_PACKAGE.API_ID.eq(apiId)));
+
+        Long allTotalQuota = list.stream().mapToLong(UserPackage::getTotalQuota).sum();
+        Long allUsedQuota = list.stream().mapToLong(UserPackage::getUsedQuota).sum();
+        Long pastTotalQuota = list.stream().filter(data -> data.getExpiredTime().before(DateTime.now())).mapToLong(UserPackage::getTotalQuota).sum();
+        Long pastUsedQuota = list.stream().filter(data -> data.getExpiredTime().before(DateTime.now())).mapToLong(UserPackage::getUsedQuota).sum();
+
+        return Quota.builder()
+                .allTotalQuota(allTotalQuota)
+                .allUsedQuota(allUsedQuota)
+                .pastTotalQuota(pastTotalQuota)
+                .pastUsedQuota(pastUsedQuota)
+                .build();
     }
 
 
