@@ -41,7 +41,6 @@ public class ResponseRewriteService implements RewriteFunction<byte[], byte[]> {
             serverWebExchange.getResponse().getHeaders()
                     .add("ApiMix-Id",request.getId());
 
-
             //todo： 使用流量包，添加次数
 
 

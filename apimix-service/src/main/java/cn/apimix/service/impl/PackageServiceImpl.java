@@ -144,7 +144,10 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, Package> impl
         // 判断该套餐是否限购，如限购判断购买次数
         if (packageInfo.getLimitQuota() != 0) {
             Assert.isTrue(
-                    userPackageService.getPackageCount(packageInfo.getId()) + count <= packageInfo.getLimitQuota(),
+                    userPackageService.getPackageCount(
+                            packageInfo.getId(),
+                            userId
+                    ) + count <= packageInfo.getLimitQuota(),
                     "购买次数不能超过限制"
             );
         }

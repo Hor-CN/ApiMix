@@ -4,24 +4,22 @@ import cn.apimix.common.model.InterfaceInfo;
 import cn.apimix.common.model.InterfaceToken;
 import cn.apimix.common.model.InterfaceUser;
 import cn.apimix.common.service.InnerInterfaceService;
-import cn.apimix.model.entity.ApiInfo;
-import cn.apimix.model.entity.User;
-import cn.apimix.model.entity.UserApiRelation;
-import cn.apimix.model.entity.UserToken;
-import cn.apimix.service.impl.ApiServiceImpl;
-import cn.apimix.service.impl.UserApiRelationServiceImpl;
-import cn.apimix.service.impl.UserServiceImpl;
-import cn.apimix.service.impl.UserTokenServiceImpl;
+import cn.apimix.model.entity.*;
+import cn.apimix.service.impl.*;
+import com.mybatisflex.core.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Author: Hor
  * @Date: 2024/6/16 下午7:58
  * @Version: 1.0
  */
+@Slf4j
 @Component
 @DubboService
 public class InnerInterfaceServiceImpl implements InnerInterfaceService {
@@ -37,6 +35,12 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
 
     @Resource
     private UserApiRelationServiceImpl relationService;
+
+    @Resource
+    private UserPackageServiceImpl userPackageService;
+
+    @Resource
+    private ApiTokenServiceImpl apiTokenService;
 
     /**
      * 接口调用
@@ -60,7 +64,6 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
             return false;
         }
 
-        // todo 如果接口不收费
         if (!apiInfo.getIsPaid()) {
             return false;
         }
@@ -163,6 +166,37 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
                 .createTime(apiInfo.getCreateTime())
                 .updateTime(apiInfo.getUpdateTime())
                 .build();
+    }
+
+    /**
+     * 是否能调用
+     *
+     * @param apiId 接口ID
+     * @param token token
+     * @return boolean
+     */
+    @Override
+    public Boolean isInvoke(Long apiId, String token) {
+        // 根据 Token 获取信息
+        UserToken userToken = tokenService.selectTokenByTokenValue(token);
+        // 根据 接口ID 获取信息
+        ApiInfo apiInfo = apiService.getById(apiId);
+        // 未代理接口无法调用
+        if (!apiInfo.getProxy()) {
+            return false;
+        }
+        // 1. 判断Token是否有分配到此接口，有则判断此token在此接口上的限制次数
+        ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
+        // 未分配，没有可用次数返回false
+        if (apiToken != null && apiToken.getTotalQuota() < apiToken.getUsedQuota()) {
+            return false;
+        }
+
+        // 获取可用套餐
+        List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userToken.getUserId());
+
+        return !availablePackages.isEmpty();
+
     }
 
 

@@ -47,7 +47,6 @@ public class RequestRewriteService implements RewriteFunction<byte[], byte[]> {
 
         // 构建请求参数
         RequestParams requestParams = RequestParams.builder()
-                //http://api.yujn.cn/api/zzxjj.php?type=video
                 .url(interfaceInfo.getUrl())
                 // 请求方式
                 .method(request.getMethodValue()).build();

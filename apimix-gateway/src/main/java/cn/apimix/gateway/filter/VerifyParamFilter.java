@@ -85,9 +85,9 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
             throw new BusinessException(400, "免费或未代理接口");
         }
 
-        //todo： 判断该token是否分配给该接口，如果是判断是否足够次数
-
-        //todo：可用流量包的判断
+        if (!innerInterfaceService.isInvoke(apiId, token)) {
+            throw new BusinessException(400, "请求超过次数限制");
+        }
 
         return chain.filter(exchange);
     }

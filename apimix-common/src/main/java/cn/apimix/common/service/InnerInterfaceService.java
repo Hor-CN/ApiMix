@@ -49,4 +49,12 @@ public interface InnerInterfaceService {
      */
     InterfaceInfo getInterfaceInfo(Long apiId);
 
+    /**
+     * 能否调用
+     * @param apiId 接口ID
+     * @param token token
+     * @return boolean
+     */
+    Boolean isInvoke(Long apiId, String token);
+
 }
