@@ -1,9 +1,11 @@
 package cn.apimix.provider;
 
 import cn.apimix.common.model.InterfaceInfo;
+import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.common.model.InterfaceToken;
 import cn.apimix.common.model.InterfaceUser;
 import cn.apimix.common.service.InnerInterfaceService;
+import cn.apimix.core.exception.HorApiException;
 import cn.apimix.model.entity.*;
 import cn.apimix.service.impl.*;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,9 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
     @Resource
     private ApiTokenServiceImpl apiTokenService;
 
+    @Resource
+    private ApiLogServiceImpl apiLogService;
+
     /**
      * 接口调用
      * 按次数扣
@@ -53,30 +58,38 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
      */
     @Transactional
     @Override
-    public Boolean invoke(Long apiId, String token) {
+    public Boolean invoke(Long apiId, String token, InterfaceLog interfaceLog) {
 
-        ApiInfo apiInfo = apiService.getById(apiId);
-        // 如果不收费，直接调用成功
-        if (!apiInfo.getIsPaid()) {
-            return true;
+        try {
+            ApiInfo apiInfo = apiService.getById(apiId);
+            // 如果不收费，直接调用成功
+            if (!apiInfo.getIsPaid()) {
+                return true;
+            }
+
+            // 根据 Token 获取信息
+            UserToken userToken = tokenService.selectTokenByTokenValue(token);
+
+            // 根据条件使用最适合的流量包【0】
+            List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userToken.getUserId());
+            // 添加套餐的使用次数
+            Boolean packageIncrease = userPackageService.increaseTheNumberOfCalls(availablePackages.get(0).getId());
+
+            ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
+            // 分配的token统计增加
+            Boolean apiTokenIncrease = true;
+            if (apiToken != null) {
+                apiTokenIncrease = apiTokenService.increaseTheNumberOfCalls(apiToken.getTokenId());
+            }
+
+            // 添加日志
+            Boolean logIncrease = apiLogService.insertApiLog(interfaceLog);
+            return packageIncrease && apiTokenIncrease && logIncrease;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
         }
 
-        // 根据 Token 获取信息
-        UserToken userToken = tokenService.selectTokenByTokenValue(token);
-
-        // 根据条件使用最适合的流量包【0】
-        List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userToken.getUserId());
-        // 添加套餐的使用次数
-        Boolean packageIncrease = userPackageService.increaseTheNumberOfCalls(availablePackages.get(0).getId());
-
-        ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
-        // 分配的token统计增加
-        Boolean apiTokenIncrease = true;
-        if (apiToken != null) {
-            apiTokenIncrease = apiTokenService.increaseTheNumberOfCalls(apiToken.getTokenId());
-        }
-
-        return packageIncrease && apiTokenIncrease;
     }
 
     /**

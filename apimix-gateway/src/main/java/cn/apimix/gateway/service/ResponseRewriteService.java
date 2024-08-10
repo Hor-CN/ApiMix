@@ -1,20 +1,25 @@
 package cn.apimix.gateway.service;
 
+import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.common.service.InnerInterfaceService;
 import cn.apimix.gateway.exception.BusinessException;
 import cn.apimix.gateway.utils.NetUtils;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.factory.rewrite.RewriteFunction;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 /**
  * @Author: Hor
@@ -47,6 +52,26 @@ public class ResponseRewriteService implements RewriteFunction<byte[], byte[]> {
             log.info("响应头：{}",response.getHeaders());
             log.info("======请求日志(ID:{})结束======", request.getId());
 
+            InterfaceLog interfaceLog = serverWebExchange.getAttribute("InterfaceLog");
+
+            interfaceLog.setStatus(response.getStatusCode().value() == 200 ? "成功" : "失败");
+            interfaceLog.setResponseHeaders(JSONUtil.parseObj(response.getHeaders(), false).toStringPretty());
+
+            String originalResponseContentType = serverWebExchange.getAttribute(ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
+
+            if (Objects.equals(response.getStatusCode(), HttpStatus.OK)
+                    && StringUtils.isNotBlank(originalResponseContentType)
+                    && originalResponseContentType.contains("application/json")) {
+                interfaceLog.setResponseBody(JSONUtil.parseObj(bytes, false).toStringPretty());
+            } else {
+                interfaceLog.setResponseBody("只记录类型为application/json的内容");
+            }
+
+
+            // 响应时间
+            interfaceLog.setResponseTime(DateTime.now());
+
+
             // 添加请求日志ID
             serverWebExchange.getResponse().getHeaders()
                     .add("ApiMix-Id",request.getId());
@@ -55,7 +80,14 @@ public class ResponseRewriteService implements RewriteFunction<byte[], byte[]> {
             Long apiId = NetUtils.convertApiId(request);
             // 获取Token信息
             String token = request.getHeaders().getFirst("X-APIMix-Token");
-            Boolean invoke = innerInterfaceService.invoke(apiId, token);
+
+            // 结束时间
+            interfaceLog.setEndTime(DateTime.now());
+
+
+            Boolean invoke = innerInterfaceService.invoke(apiId, token, interfaceLog);
+
+
             if (!invoke) {
                 throw new BusinessException(400, "接口调用失败");
             }

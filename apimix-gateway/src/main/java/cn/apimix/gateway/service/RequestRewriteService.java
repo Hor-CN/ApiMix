@@ -1,11 +1,13 @@
 package cn.apimix.gateway.service;
 
 import cn.apimix.common.model.InterfaceInfo;
+import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.common.service.InnerInterfaceService;
 import cn.apimix.gateway.model.ApiParamField;
 import cn.apimix.gateway.model.ApiParamTypeEnum;
 import cn.apimix.gateway.model.RequestParams;
 import cn.apimix.gateway.utils.NetUtils;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -13,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.factory.rewrite.RewriteFunction;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -91,6 +92,15 @@ public class RequestRewriteService implements RewriteFunction<byte[], byte[]> {
         requestParams.setBody(bodys);
 
         JSONObject newRequest = JSONUtil.parseObj(requestParams);
+
+
+        InterfaceLog interfaceLog = exchange.getAttribute("InterfaceLog");
+        if (interfaceLog != null) {
+            interfaceLog.setTargetServer(apiId);
+            interfaceLog.setTargetName(interfaceInfo.getName());
+            interfaceLog.setRequestTime(DateTime.now());
+        }
+
         try {
             log.info("请求调用报文:{}", newRequest);
             return Mono.just(newRequest.toString().getBytes());

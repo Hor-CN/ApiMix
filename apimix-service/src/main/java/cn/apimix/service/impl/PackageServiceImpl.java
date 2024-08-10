@@ -5,7 +5,6 @@ import cn.apimix.mapper.PackageMapper;
 import cn.apimix.model.entity.Package;
 import cn.apimix.model.entity.*;
 import cn.apimix.model.entity.table.PackageTableDef;
-import cn.apimix.model.entity.table.UserApiRelationTableDef;
 import cn.apimix.model.entity.table.UserPackageTableDef;
 import cn.apimix.model.vo.api.SkuVo;
 import cn.apimix.service.IPackageService;
@@ -197,15 +196,6 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, Package> impl
                 .expiredTime(expiredTime)
                 .build());
 
-//        // 在用户调用接口关系表user_api_relation中添加
-//        UserApiRelation userApiRelation = userApiRelationService.getOne(query().where(
-//                UserApiRelationTableDef.USER_API_RELATION.API_ID.eq(packageInfo.getApiId())
-//                        .and(UserApiRelationTableDef.USER_API_RELATION.USER_ID.eq(userId))
-//        ));
-
-//        if (userApiRelation != null) {
-//            totalQuota = userApiRelation.getTotalQuota() + totalQuota;
-//        }
 
         return userApiRelationService.save(UserApiRelation.builder()
                 .userId(userId)

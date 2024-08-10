@@ -1,6 +1,7 @@
 package cn.apimix.common.service;
 
 import cn.apimix.common.model.InterfaceInfo;
+import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.common.model.InterfaceToken;
 import cn.apimix.common.model.InterfaceUser;
 
@@ -19,9 +20,10 @@ public interface InnerInterfaceService {
      *
      * @param apiId 接口ID
      * @param token 调用此接口的Token
+     * @param log 日志
      * @return boolean 扣费结果
      */
-    Boolean invoke(Long apiId, String token);
+    Boolean invoke(Long apiId, String token, InterfaceLog log);
 
 
     /**

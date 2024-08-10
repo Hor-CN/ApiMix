@@ -1,6 +1,7 @@
 package cn.apimix.gateway.filter;
 
 import cn.apimix.common.model.InterfaceInfo;
+import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.common.model.InterfaceToken;
 import cn.apimix.common.model.InterfaceUser;
 import cn.apimix.common.service.InnerInterfaceService;
@@ -84,6 +85,12 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
 
         if (!innerInterfaceService.isInvoke(apiId, token)) {
             throw new BusinessException(400, "请求超过次数限制");
+        }
+
+        InterfaceLog interfaceLog = exchange.getAttribute("InterfaceLog");
+
+        if (interfaceLog != null) {
+            interfaceLog.setUserId(interfaceUser.getId());
         }
 
         return chain.filter(exchange);
