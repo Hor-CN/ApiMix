@@ -3,6 +3,7 @@ package cn.apimix.service;
 import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.model.entity.ApiLog;
 import cn.apimix.model.vo.api.ApiStatistics;
+import cn.apimix.model.vo.api.MonitorLine;
 import com.mybatisflex.core.service.IService;
 
 /**
@@ -37,6 +38,7 @@ public interface IApiLogService extends IService<ApiLog> {
 
     //     * @param startDate 开始日期
     //     * @param endDate 结束日期
+    MonitorLine getMonitorLine(Long apiId,Long userId, Long startTime, Long endTime);
 
     /**
      * 获取某用户日志统计

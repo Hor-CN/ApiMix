@@ -81,7 +81,7 @@ public class UserController {
 
     @Async("threadPool")
     @RequestMapping("/emailCode")
-    public void sendEmailCode(@RequestParam String email) {
+    public void getEmailCaptcha(@RequestParam String email) {
         emailService.sendEmailCode(email);
     }
 

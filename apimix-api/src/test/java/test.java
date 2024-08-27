@@ -15,9 +15,9 @@ import java.util.Date;
 public class test {
     public static void main(String[] args) {
 
-        Date dateTime = DateUtil.parseDate("2024-07-26 17:52:08");
-
-        System.out.println(dateTime.getTime());
+//        Date dateTime = DateUtil.parseDate("2024-07-26 17:52:08");
+        System.out.println(DateTime.of(1722700800000L));
+//        System.out.println(dateTime.getTime());
 //        System.out.println(DateUtil.offsetDay(DateUtil.date(), 30));
 //        String content = "test中文";
 //        byte[] key = SecureUtil.generateKey(SymmetricAlgorithm.DESede.getValue()).getEncoded();
