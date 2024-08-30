@@ -8,6 +8,7 @@ import cn.apimix.common.service.InnerInterfaceService;
 import cn.apimix.core.exception.HorApiException;
 import cn.apimix.model.entity.*;
 import cn.apimix.service.impl.*;
+import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Component;
@@ -121,8 +122,11 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
     @Override
     public InterfaceToken getTokenByTokenValue(String tokenValue) {
         UserToken userToken = tokenService.selectTokenByTokenValue(tokenValue);
+        if (userToken == null) {
+            return null;
+        }
         return InterfaceToken.builder()
-                .id(userToken.getUserId())
+                .id(userToken.getId())
                 .userId(userToken.getUserId())
                 .tokenValue(userToken.getTokenValue())
                 .expired(userToken.getExpired())

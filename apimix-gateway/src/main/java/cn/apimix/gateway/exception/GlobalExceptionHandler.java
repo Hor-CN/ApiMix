@@ -45,7 +45,7 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
             error = Result.buildFail(businessException.getCode(), ex.getMessage());
         }
 
-        log.error("【网关异常】：{}", ex.getMessage());
+        log.error("【网关异常】：{}", ex.toString());
         try {
             byte[] errorBytes = objectMapper.writeValueAsBytes(error);
             DataBuffer dataBuffer = bufferFactory.wrap(errorBytes);
