@@ -29,6 +29,7 @@ public class UserApiRelationServiceImpl extends ServiceImpl<UserApiRelationMappe
                                 ApiInfoTableDef.API_INFO.NAME,
                                 ApiInfoTableDef.API_INFO.LOGO
                         ).from(UserApiRelationTableDef.USER_API_RELATION)
+                        .where(UserApiRelationTableDef.USER_API_RELATION.USER_ID.eq(userId))
                         .leftJoin(ApiInfoTableDef.API_INFO).on(UserApiRelationTableDef.USER_API_RELATION.API_ID.eq(ApiInfoTableDef.API_INFO.ID))
                 , ApiRelationVo.class);
     }

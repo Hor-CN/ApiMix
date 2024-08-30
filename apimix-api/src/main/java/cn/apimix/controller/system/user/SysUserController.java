@@ -1,18 +1,21 @@
 package cn.apimix.controller.system.user;
 
 import cn.apimix.core.annotation.ResponseResult;
+import cn.apimix.core.core.model.PageRequest;
+import cn.apimix.model.dto.api.AuditAddRequest;
 import cn.apimix.model.dto.system.user.*;
 import cn.apimix.model.entity.User;
+import cn.apimix.model.entity.UserRole;
+import cn.apimix.model.entity.table.UserRoleTableDef;
 import cn.apimix.model.mapstruct.UserMapping;
 import cn.apimix.model.vo.user.UserVo;
-import cn.apimix.service.impl.MenuServiceImpl;
-import cn.apimix.service.impl.RoleServiceImpl;
-import cn.apimix.service.impl.UserServiceImpl;
+import cn.apimix.service.impl.*;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.lang.Assert;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -44,6 +47,12 @@ public class SysUserController {
     private MenuServiceImpl menuService;
 
     @Resource
+    private AuditServiceImpl auditService;
+
+    @Resource
+    private UserRoleServiceImpl userRoleService;
+
+    @Resource
     private UserMapping userMapping;
 
     /**
@@ -63,6 +72,50 @@ public class SysUserController {
         // 返回结果集
         return new Page<>(userVos, userPage.getPageNumber(), userPage.getPageSize(), userPage.getTotalPage());
     }
+
+
+    /**
+     * 获取待审核的开发者认证申请
+     */
+    @SaCheckLogin
+    @SaCheckPermission("sys:apply:dev")
+    @GetMapping("auditDevs")
+    public Page<UserVo> getAuditDevByPage(@Valid PageRequest request) {
+        Page<User> userPage = userService.selectAuditUserDevByPage(request);
+        List<UserVo> userVos = userMapping.usersToUserVos(userPage.getRecords());
+        return new Page<>(userVos, userPage.getPageNumber(), userPage.getPageSize(), userPage.getTotalPage());
+    }
+
+    /**
+     * 开发者认证审核
+     */
+    @SaCheckLogin
+    @SaCheckPermission("sys:apply:dev")
+    @PostMapping("auditDev")
+    public Boolean updateAudit(@RequestBody @Valid AuditAddRequest addRequest) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        // 如果是通过审核将用户添加开发者权限
+        // 如果本身是开发者就不添加
+        boolean exists = userRoleService.exists(
+                new QueryWrapper().where(UserRoleTableDef.USER_ROLE.USER_ID.eq(addRequest.getFlowNo()))
+                        .and(UserRoleTableDef.USER_ROLE.ROLE_ID.eq(3))
+        );
+        if (exists) {
+            return false;
+        }
+        userRoleService.save(UserRole.builder()
+                .userId(addRequest.getFlowNo())
+                .roleId(3)
+                .build());
+
+        return auditService.updateAudit(
+                addRequest.getFlowNo(),
+                userId,
+                addRequest.getStatus(),
+                addRequest.getRemark()
+        );
+    }
+
 
 
     /**

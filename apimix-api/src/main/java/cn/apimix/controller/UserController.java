@@ -1,23 +1,26 @@
 package cn.apimix.controller;
 
+import cn.apimix.RedisUtils;
+import cn.apimix.common.resp.Result;
+import cn.apimix.config.CacheConstants;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.core.model.IdRequest;
-import cn.apimix.common.resp.Result;
-import cn.apimix.model.dto.user.UserEditRequest;
-import cn.apimix.model.dto.user.UserLoginRequest;
+import cn.apimix.model.dto.user.*;
+import cn.apimix.model.entity.Audit;
 import cn.apimix.model.entity.Menu;
 import cn.apimix.model.entity.Role;
 import cn.apimix.model.entity.User;
 import cn.apimix.model.mapstruct.UserMapping;
 import cn.apimix.model.vo.user.UserLoginVo;
 import cn.apimix.model.vo.user.UserVo;
-import cn.apimix.service.impl.EmailServiceImpl;
+import cn.apimix.service.impl.AuditServiceImpl;
 import cn.apimix.service.impl.MenuServiceImpl;
 import cn.apimix.service.impl.UserServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
-import org.springframework.scheduling.annotation.Async;
+import cn.hutool.core.lang.Assert;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -48,8 +51,11 @@ public class UserController {
     private MenuServiceImpl menuService;
 
     @Resource
-    private EmailServiceImpl emailService;
+    private AuditServiceImpl auditService;
 
+
+    private static final String CAPTCHA_EXPIRED = "验证码已失效";
+    private static final String CAPTCHA_ERROR = "验证码错误";
 
     /**
      * 登录用户
@@ -59,11 +65,40 @@ public class UserController {
      */
     @PostMapping("login")
     public UserLoginVo login(@RequestBody @Valid UserLoginRequest loginRequest) {
+        // 验证码前缀
+        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + loginRequest.getUuid();
+        // 获取验证码
+        String captcha = RedisUtils.get(captchaKey);
+        // 验证码已失效
+        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
+        // 验证成功删除
+        RedisUtils.delete(captchaKey);
+        // 验证码是否相等
+        Assert.equals(loginRequest.getCaptcha(), captcha, CAPTCHA_ERROR);
+
         Long userId = userService.login(loginRequest);
         return UserLoginVo.builder()
                 .id(String.valueOf(userId))
                 .token(StpUtil.getTokenValue())
                 .build();
+    }
+
+    @PostMapping("/email")
+    public UserLoginVo emailLogin(@Validated @RequestBody EmailLoginRequest loginReq) {
+        String email = loginReq.getEmail();
+        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + email;
+        String captcha = RedisUtils.get(captchaKey);
+        // 验证码已失效
+        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
+        // 验证码是否相等
+        Assert.equals(loginReq.getCaptcha(), captcha, CAPTCHA_ERROR);
+        RedisUtils.delete(captchaKey);
+
+        Long userId = userService.emailLogin(email);
+
+        return UserLoginVo.builder()
+                .id(String.valueOf(userId))
+                .token(StpUtil.getTokenValue()).build();
     }
 
 
@@ -77,12 +112,6 @@ public class UserController {
         StpUtil.getSession().delete("user");
         StpUtil.logout();
         return Result.buildSuccess("注销登录成功");
-    }
-
-    @Async("threadPool")
-    @RequestMapping("/emailCode")
-    public void getEmailCaptcha(@RequestParam String email) {
-        emailService.sendEmailCode(email);
     }
 
 
@@ -127,6 +156,70 @@ public class UserController {
     public Boolean editUser(@RequestBody UserEditRequest editRequest) {
         return userService.updateProfile(editRequest, StpUtil.getLoginIdAsLong());
     }
+
+    /**
+     * 修改密码
+     *
+     * @param updateReq
+     */
+    @SaCheckLogin
+    @PostMapping("/password")
+    public void updatePassword(@Validated @RequestBody UserPasswordUpdateRequest updateReq) {
+        userService.resetUserPassword(StpUtil.getLoginIdAsLong(), updateReq.getOldPassword(), updateReq.getNewPassword());
+        // 修改后登出
+        StpUtil.logout();
+    }
+
+
+    /**
+     * 修改邮箱
+     */
+    @SaCheckLogin
+    @PostMapping("/updateEmail")
+    public void updateUserEmail(@Validated @RequestBody UserEmailUpdateRequest updateReq) {
+        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + updateReq.getEmail();
+        String captcha = RedisUtils.get(captchaKey);
+        // 验证码已失效
+        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
+        // 验证码是否相等
+        Assert.equals(updateReq.getCaptcha(), captcha, CAPTCHA_ERROR);
+        RedisUtils.delete(captchaKey);
+        userService.updateEmail(updateReq.getEmail(), updateReq.getOldPassword(), StpUtil.getLoginIdAsLong());
+    }
+
+    /**
+     * 开发者认证提交
+     */
+    @SaCheckLogin
+    @PostMapping("/applyDeveloper")
+    public Boolean applyDeveloper(@Validated @RequestBody ApplyDeveloperRequest request) {
+
+        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + request.getEmail();
+        String captcha = RedisUtils.get(captchaKey);
+        // 验证码已失效
+        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
+        // 验证码是否相等
+        Assert.equals(request.getCaptcha(), captcha, CAPTCHA_ERROR);
+        RedisUtils.delete(captchaKey);
+
+        return auditService.insertAudit(Audit.builder()
+                .flowNo(StpUtil.getLoginIdAsLong())
+                .type(2)
+                .status(1)
+                .build());
+    }
+
+    /**
+     * 获取开发者申请的状态
+     */
+    @SaCheckLogin
+    @GetMapping("/getDevStatus")
+    public Audit getDevStatus() {
+        return auditService.selectAuditStatus(StpUtil.getLoginIdAsLong(), 2);
+    }
+
+
+
 
     /**
      * 构建当前用户的菜单路由

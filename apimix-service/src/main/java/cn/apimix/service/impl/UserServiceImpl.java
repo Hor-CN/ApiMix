@@ -1,5 +1,6 @@
 package cn.apimix.service.impl;
 
+import cn.apimix.core.core.model.PageRequest;
 import cn.apimix.mapper.UserMapper;
 import cn.apimix.model.dto.system.user.SysUserAddRequest;
 import cn.apimix.model.dto.system.user.SysUserEditRequest;
@@ -8,6 +9,7 @@ import cn.apimix.model.dto.user.UserEditRequest;
 import cn.apimix.model.dto.user.UserLoginRequest;
 import cn.apimix.model.entity.Role;
 import cn.apimix.model.entity.User;
+import cn.apimix.model.entity.table.AuditTableDef;
 import cn.apimix.model.entity.table.UserTableDef;
 import cn.apimix.model.enums.RoleTypeEnum;
 import cn.apimix.model.mapstruct.UserMapping;
@@ -25,6 +27,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.StringUtil;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -68,16 +71,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 SaSecureUtil.md5BySalt(loginRequest.getPassword(), user.getSalt()),
                 "账号或密码错误，登录失败"
         );
-        // 判断用户状态是否处于禁用状态
-        if (user.getStatus() == 0) {
-            StpUtil.disable(user.getId(), -1);
-        } else if (StpUtil.isDisable(user.getId())) {
-            StpUtil.untieDisable(user.getId());
-        }
-        Assert.isFalse(
-                StpUtil.isDisable(user.getId()),
-                "账号已被封禁" + StpUtil.getDisableTime(user.getId())
-        );
+
         // 登录成功
         SaLoginModel saLoginModel = SaLoginModel.create()
                 .setDevice(loginRequest.getDevice())
@@ -88,6 +82,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         StpUtil.getSession().set("user", user);
         // 返回用户ID
         return user.getId();
+    }
+
+
+    public Long emailLogin(String email) {
+        boolean exists = queryChain().where(UserTableDef.USER.EMAIL.eq(email)).exists();
+        Assert.isTrue(exists, "此邮箱未绑定本系统账号");
+        User user = queryChain().where(UserTableDef.USER.EMAIL.eq(email)).one();
+
+        this.checkUserStatus(user);
+        StpUtil.login(user.getId());
+        // 存在 Account-Session 中 减少查找数据库
+        StpUtil.getSession().set("user", user);
+        // 返回用户ID
+        return user.getId();
+    }
+
+
+    public void checkUserStatus(User user) {
+        // 判断用户状态是否处于禁用状态
+        if (user.getStatus() == 0) {
+            StpUtil.disable(user.getId(), -1);
+        } else if (StpUtil.isDisable(user.getId())) {
+            StpUtil.untieDisable(user.getId());
+        }
+        Assert.isFalse(
+                StpUtil.isDisable(user.getId()),
+                "账号已被封禁" + StpUtil.getDisableTime(user.getId())
+        );
     }
 
     /**
@@ -238,11 +260,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean resetUserPassword(Long userId, String oldPassword, String newPassword) {
-        // 获取用户
-        QueryWrapper queryWrapper = QueryWrapper.create()
-                .where(UserTableDef.USER.ID.eq(userId));
-        User user = getById(queryWrapper);
+        User user = getById(userId);
         // 比对新旧密码
         String salt = user.getSalt();
         String oldPasswordSalt = SaSecureUtil.md5BySalt(oldPassword, salt);
@@ -251,6 +271,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setPassword(newPasswordSalt);
         return updateById(user);
     }
+
+    public void updateEmail(String newEmail, String oldPassword, Long id) {
+        User user = getById(id);
+        String oldPasswordSalt = SaSecureUtil.md5BySalt(oldPassword, user.getSalt());
+
+        Assert.isTrue(oldPasswordSalt.equals(user.getPassword()), "原密码不正确");
+
+        boolean exists = queryChain().where(UserTableDef.USER.EMAIL.eq(newEmail)).exists();
+        Assert.isFalse(exists, "邮箱已绑定其他账号，请更换其他邮箱");
+        Assert.notEquals(newEmail, user.getEmail(), "新邮箱不能与当前邮箱相同");
+        // 更新邮箱
+        user.setEmail(newEmail);
+        updateById(user);
+    }
+
 
     /**
      * 重置用户密码
@@ -302,4 +337,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 逻辑删除该用户
         return removeByIds(userIds);
     }
+
+
+
+    /**
+     * 分页获取待审核的用户认证列表
+     */
+    public Page<User> selectAuditUserDevByPage(PageRequest request) {
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .select(UserTableDef.USER.ALL_COLUMNS)
+                .leftJoin(AuditTableDef.AUDIT)
+                .on(UserTableDef.USER.ID.eq(AuditTableDef.AUDIT.FLOW_NO))
+                .where(AuditTableDef.AUDIT.STATUS.eq(1));
+        return page(Page.of(request.getPageNumber(), request.getPageSize()),
+                queryWrapper);
+    }
+
+
+
+
+
+
 }

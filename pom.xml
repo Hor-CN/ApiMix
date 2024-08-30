@@ -42,7 +42,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <mybatis.flex.version>1.8.9</mybatis.flex.version>
-        <satoken.version>1.37.0</satoken.version>
+        <satoken.version>1.38.0</satoken.version>
         <hikaricp.version>4.0.3</hikaricp.version>
         <knife4j.version>4.5.0</knife4j.version>
         <hutool.version>5.8.25</hutool.version>
@@ -50,6 +50,8 @@
         <snakeyaml.version>2.0</snakeyaml.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
 
+        <redis.version>1.38.0</redis.version>
+        <redisson.version>3.34.1</redisson.version>
 
         <apimix.common.version>1.0-SNAPSHOT</apimix.common.version>
         <apimix.core.version>1.0-SNAPSHOT</apimix.core.version>
@@ -95,6 +97,12 @@
                 <version>${apimix.model.version}</version>
             </dependency>
 
+            <!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-jackson</artifactId>
+                <version>${redis.version}</version>
+            </dependency>
 
             <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
             <dependency>
@@ -203,6 +211,14 @@
                 <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+
+            <!--redisson-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
         </dependencies>

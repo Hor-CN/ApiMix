@@ -41,6 +41,14 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
     }
 
 
+    public Audit selectAuditStatus(Long flowNo, Integer type) {
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .where(AuditTableDef.AUDIT.TYPE.eq(type))
+                .and(AuditTableDef.AUDIT.FLOW_NO.eq(flowNo));
+        return getOne(queryWrapper);
+    }
+
+
     /**
      * 获取审核明细
      */
@@ -67,7 +75,7 @@ public class AuditServiceImpl extends ServiceImpl<AuditMapper, Audit> implements
         auditDetailService.save(AuditRecord.builder()
                 .auditId(audit.getId())
                 .status(1)
-                .remark("用户上传接口")
+                .remark("用户提交")
                 .build());
         return save;
     }
