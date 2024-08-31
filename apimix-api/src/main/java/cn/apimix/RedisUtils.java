@@ -14,6 +14,7 @@ import org.redisson.api.*;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +48,7 @@ public class RedisUtils {
      * @param duration 过期时间
      */
     public static <T> void set(String key, T value, Duration duration) {
-        CLIENT.getBucket(key).set(value, duration);
+        CLIENT.getBucket(key).set(value, duration.toMillis(), TimeUnit.MINUTES);
     }
 
     /**

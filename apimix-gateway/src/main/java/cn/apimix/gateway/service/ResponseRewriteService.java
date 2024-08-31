@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -76,6 +77,8 @@ public class ResponseRewriteService implements RewriteFunction<byte[], byte[]> {
             serverWebExchange.getResponse().getHeaders()
                     .add("ApiMix-Id",request.getId());
 
+            serverWebExchange.getResponse().getHeaders().remove("Access-Control-Allow-Origin");
+            serverWebExchange.getResponse().getHeaders().add("Access-Control-Allow-Origin","*");
             // 请求的接口ID
             Long apiId = NetUtils.convertApiId(request);
             // 获取Token信息

@@ -4,8 +4,6 @@ server:
     whitelabel:
       enabled: false
 
-
-
 spring:
   application:
     name: apimix-provider

@@ -42,16 +42,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <mybatis.flex.version>1.8.9</mybatis.flex.version>
-        <satoken.version>1.38.0</satoken.version>
+        <satoken.version>1.39.0</satoken.version>
         <hikaricp.version>4.0.3</hikaricp.version>
         <knife4j.version>4.5.0</knife4j.version>
         <hutool.version>5.8.25</hutool.version>
         <mysql.version>8.2.0</mysql.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-
-        <redis.version>1.38.0</redis.version>
-        <redisson.version>3.34.1</redisson.version>
 
         <apimix.common.version>1.0-SNAPSHOT</apimix.common.version>
         <apimix.core.version>1.0-SNAPSHOT</apimix.core.version>
@@ -97,12 +94,7 @@
                 <version>${apimix.model.version}</version>
             </dependency>
 
-            <!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis-jackson</artifactId>
-                <version>${redis.version}</version>
-            </dependency>
+
 
             <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
             <dependency>
@@ -110,6 +102,14 @@
                 <artifactId>sa-token-spring-boot-starter</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
+
+            <!-- Sa-Token 整合 Redisson (使用 jackson 序列化方式) -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redisson-jackson</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+
 
             <!-- HikariCP 数据库连接池的依赖配置 -->
             <dependency>
@@ -213,14 +213,6 @@
                 <scope>import</scope>
             </dependency>
 
-
-            <!--redisson-->
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-boot-starter</artifactId>
-                <version>${redisson.version}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -237,24 +229,24 @@
     </dependencies>
 
 
-    <!-- 构建 -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
+<!--    &lt;!&ndash; 构建 &ndash;&gt;-->
+<!--    <build>-->
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <excludes>-->
+<!--                        <exclude>-->
+<!--                            <groupId>org.projectlombok</groupId>-->
+<!--                            <artifactId>lombok</artifactId>-->
+<!--                        </exclude>-->
+<!--                    </excludes>-->
+<!--                </configuration>-->
 
-            </plugin>
-        </plugins>
-    </build>
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 
 
 </project>
