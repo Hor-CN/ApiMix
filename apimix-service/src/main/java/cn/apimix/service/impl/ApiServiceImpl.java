@@ -74,7 +74,7 @@ public class ApiServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> implemen
         boolean exists = queryChain().where(ApiInfoTableDef.API_INFO.URL.eq(addRequest.getUrl())).exists();
         Assert.isFalse(exists, "接口已存在");
 
-        Assert.isTrue(addRequest.getIsPaid() && addRequest.getProxy(), "收费接口必须代理");
+        Assert.isFalse(addRequest.getIsPaid() && addRequest.getProxy(), "收费接口必须代理");
 
         // 构建API信息
         ApiInfo apiInfo = apiMapping.apiAddRequestToApi(addRequest);
@@ -187,8 +187,10 @@ public class ApiServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> implemen
         // 新增响应示例
         apiExampleMapper.insertBatch(result);
 
-        // 新增参数
-        paramService.getMapper().insertBatch(requestQuery);
+        if(!requestQuery.isEmpty()) {
+            // 新增参数
+            paramService.getMapper().insertBatch(requestQuery);
+        }
 
         // 新增待审核
         auditService.insertAudit(Audit.builder()

@@ -33,6 +33,7 @@
         <module>apimix-gateway</module>
         <!-- 接口调用模块 -->
         <module>apimix-invoke</module>
+        <module>apimix-wx</module>
     </modules>
 
     <!-- 配置属性 -->
@@ -56,6 +57,7 @@
         <apimix.service.version>1.0-SNAPSHOT</apimix.service.version>
         <javax.mail.version>1.6.2</javax.mail.version>
 
+        <dom4j.version>2.1.3</dom4j.version>
 
         <spring-cloud.version>2021.0.5</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.0.5.0</spring-cloud-alibaba.version>
@@ -213,6 +215,13 @@
                 <scope>import</scope>
             </dependency>
 
+
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>${dom4j.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -225,28 +234,6 @@
             <optional>true</optional>
         </dependency>
 
-
     </dependencies>
-
-
-<!--    &lt;!&ndash; 构建 &ndash;&gt;-->
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <excludes>-->
-<!--                        <exclude>-->
-<!--                            <groupId>org.projectlombok</groupId>-->
-<!--                            <artifactId>lombok</artifactId>-->
-<!--                        </exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
-
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
-
 
 </project>

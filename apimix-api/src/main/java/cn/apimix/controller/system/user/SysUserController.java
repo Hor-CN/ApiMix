@@ -1,9 +1,12 @@
 package cn.apimix.controller.system.user;
 
+import cn.apimix.RedisUtils;
+import cn.apimix.config.CacheConstants;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.core.model.PageRequest;
 import cn.apimix.model.dto.api.AuditAddRequest;
 import cn.apimix.model.dto.system.user.*;
+import cn.apimix.model.dto.user.WxLoginRequest;
 import cn.apimix.model.entity.User;
 import cn.apimix.model.entity.UserRole;
 import cn.apimix.model.entity.table.UserRoleTableDef;
@@ -16,6 +19,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.lang.Assert;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -114,6 +118,48 @@ public class SysUserController {
                 addRequest.getStatus(),
                 addRequest.getRemark()
         );
+    }
+
+    /**
+     * 获取三方账号绑定列表
+     */
+    @SaCheckLogin
+    @GetMapping("social")
+    public List<String> getSocialList() {
+        Long userId = StpUtil.getLoginIdAsLong();
+        return userService.getSocial(userId);
+    }
+
+    @PostMapping("/unbindWxLogin")
+    public Boolean unBindWxLogin(@RequestBody
+                                 @Validated
+                                 WxLoginRequest loginRequest) {
+        String captchaKey = CacheConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
+        String uuid = RedisUtils.get(captchaKey);
+        // 使用后删除
+        RedisUtils.delete(captchaKey);
+
+        // 验证码已失效
+        Assert.notBlank(uuid, "验证码已失效");
+        Long userId = StpUtil.getLoginIdAsLong();
+
+        return userService.unBindWxLogin(uuid, userId);
+    }
+
+    @PostMapping("/bindWxLogin")
+    public Boolean bindWxLogin(@RequestBody
+                                 @Validated
+                                 WxLoginRequest loginRequest) {
+        String captchaKey = CacheConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
+        String uuid = RedisUtils.get(captchaKey);
+        // 使用后删除
+        RedisUtils.delete(captchaKey);
+
+        // 验证码已失效
+        Assert.notBlank(uuid, "验证码已失效");
+        Long userId = StpUtil.getLoginIdAsLong();
+
+        return userService.bindWxLogin(uuid, userId);
     }
 
 

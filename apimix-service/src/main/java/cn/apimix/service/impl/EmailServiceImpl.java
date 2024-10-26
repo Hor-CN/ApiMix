@@ -2,12 +2,14 @@ package cn.apimix.service.impl;
 
 import cn.apimix.service.IEmailService;
 import cn.dev33.satoken.util.SaFoxUtil;
+import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateUtil;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 

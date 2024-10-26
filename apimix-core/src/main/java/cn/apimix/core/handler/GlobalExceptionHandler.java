@@ -147,7 +147,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public Result<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        log.error("请求参数错误{}", Arrays.toString(e.getStackTrace()));
+        log.error("NPE异常{}", e.toString());
         return Result.buildFail(HttpStatusEnum.PARAM_ERROR);
     }
 

@@ -19,6 +19,7 @@ import cn.apimix.service.impl.UserServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
  * @Date: 2024/5/22 22:40
  * @Version: 1.0
  */
+@Slf4j
 @EnableAsync
 @RestController
 @ResponseResult
@@ -101,6 +103,32 @@ public class UserController {
                 .token(StpUtil.getTokenValue()).build();
     }
 
+    /**
+     * 微信公众号验证码登录
+     */
+    @PostMapping("/wxLogin")
+    public UserLoginVo wxLogin(
+            @RequestBody
+            @Validated
+            WxLoginRequest loginRequest
+    ) {
+
+        String captchaKey = CacheConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
+        String uuid = RedisUtils.get(captchaKey);
+        // 使用后删除
+        RedisUtils.delete(captchaKey);
+
+        // 验证码已失效
+        Assert.notBlank(uuid, CAPTCHA_EXPIRED);
+
+        Long userId = userService.wxLogin(uuid);
+
+        return UserLoginVo.builder()
+                .id(String.valueOf(userId))
+                .token(StpUtil.getTokenValue()).build();
+    }
+
+
 
     /**
      * 注销登录
@@ -159,8 +187,6 @@ public class UserController {
 
     /**
      * 修改密码
-     *
-     * @param updateReq
      */
     @SaCheckLogin
     @PostMapping("/password")

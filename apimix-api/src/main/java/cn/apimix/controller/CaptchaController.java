@@ -82,8 +82,6 @@ public class CaptchaController {
         } catch (Exception e) {
             return Result.buildFail("验证码发送失败");
         }
-
-
     }
 
 

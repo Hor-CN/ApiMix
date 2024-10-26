@@ -8,8 +8,12 @@ import cn.apimix.model.dto.system.user.SysUserQueryRequest;
 import cn.apimix.model.dto.user.UserEditRequest;
 import cn.apimix.model.dto.user.UserLoginRequest;
 import cn.apimix.model.entity.Role;
+import cn.apimix.model.entity.SocialUser;
+import cn.apimix.model.entity.SocialUserAuth;
 import cn.apimix.model.entity.User;
 import cn.apimix.model.entity.table.AuditTableDef;
+import cn.apimix.model.entity.table.SocialUserAuthTableDef;
+import cn.apimix.model.entity.table.SocialUserTableDef;
 import cn.apimix.model.entity.table.UserTableDef;
 import cn.apimix.model.enums.RoleTypeEnum;
 import cn.apimix.model.mapstruct.UserMapping;
@@ -26,6 +30,7 @@ import com.mybatisflex.core.query.If;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.StringUtil;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +46,7 @@ import java.util.stream.Collectors;
  * @Date: 2024/5/21 18:38
  * @Version: 1.0
  */
+@Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
@@ -52,6 +58,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private UserMapping userMapping;
+
+    @Resource
+    private SocialUserAuthServiceImpl socialUserAuthService;
+
+    @Resource
+    private SocialUserServiceImpl socialUserService;
 
     /**
      * 用户登录
@@ -98,6 +110,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return user.getId();
     }
 
+
+    public Long wxLogin(String uuid) {
+        // 拿到uuid与数据库的三方登录关联表对比，没有报错，有登录
+        SocialUser socialUser = socialUserService.getOne(
+                query().where(SocialUserTableDef.SOCIAL_USER.UUID.eq(uuid)).and(SocialUserTableDef.SOCIAL_USER.SOURCE.eq("WECHAT"))
+        );
+
+        Assert.notNull(socialUser, "此微信未绑定本系统账号");
+
+
+        boolean exists = socialUserAuthService.exists(query().where(SocialUserAuthTableDef.SOCIAL_USER_AUTH.SOCIAL_USER_ID.eq(socialUser.getId())));
+        Assert.isTrue(exists, "此微信未绑定本系统账号");
+
+        // 获取对应系统账户
+        Long userId = socialUserAuthService.getOne(
+                query().where(SocialUserAuthTableDef.SOCIAL_USER_AUTH.SOCIAL_USER_ID.eq(socialUser.getId()))
+        ).getUserId();
+
+        User user = queryChain().where(UserTableDef.USER.ID.eq(userId)).one();
+        this.checkUserStatus(user);
+        StpUtil.login(user.getId());
+        // 存在 Account-Session 中 减少查找数据库
+        StpUtil.getSession().set("user", user);
+        // 返回用户ID
+        return user.getId();
+    }
 
     public void checkUserStatus(User user) {
         // 判断用户状态是否处于禁用状态
@@ -285,6 +323,57 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setEmail(newEmail);
         updateById(user);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean bindWxLogin(String uuid, Long userId) {
+        Integer id;
+        SocialUser wechat = socialUserService.getOne(
+                query().where(SocialUserTableDef.SOCIAL_USER.UUID.eq(uuid))
+                        .and(SocialUserTableDef.SOCIAL_USER.SOURCE.eq("WECHAT"))
+        );
+        if (wechat == null) {
+            // 加入三方表
+            SocialUser socialUser = SocialUser.builder()
+                    .uuid(uuid)
+                    .source("WECHAT")
+                    .build();
+            socialUserService.getMapper().insert(socialUser);
+            id = socialUser.getId();
+        } else {
+            id = wechat.getId();
+        }
+
+        boolean exists = socialUserAuthService.exists(
+                query().where(SocialUserAuthTableDef.SOCIAL_USER_AUTH.SOCIAL_USER_ID.eq(id))
+                        .and(SocialUserAuthTableDef.SOCIAL_USER_AUTH.USER_ID.eq(userId))
+        );
+
+        Assert.isFalse(exists,"该微信已绑定账号");
+
+        // 绑定用户
+        return socialUserAuthService.save(SocialUserAuth.builder()
+                .socialUserId(id)
+                .userId(userId)
+                .build());
+    }
+
+    public boolean unBindWxLogin(String uuid, Long userId) {
+        SocialUser socialUser = socialUserService.getOne(query().where(SocialUserTableDef.SOCIAL_USER.UUID.eq(uuid)).and(SocialUserTableDef.SOCIAL_USER.SOURCE.eq("WECHAT")));
+        Integer socialUserId = socialUser.getId();
+        return socialUserAuthService.remove(query().where(SocialUserAuthTableDef.SOCIAL_USER_AUTH.USER_ID.eq(userId)).and(SocialUserAuthTableDef.SOCIAL_USER_AUTH.SOCIAL_USER_ID.eq(socialUserId)));
+    }
+
+
+    public List<String> getSocial(Long userId) {
+        return socialUserService.objListAs(
+                QueryWrapper.create().select(SocialUserTableDef.SOCIAL_USER.SOURCE)
+                        .join(SocialUserAuthTableDef.SOCIAL_USER_AUTH).on(SocialUserAuthTableDef.SOCIAL_USER_AUTH.USER_ID.eq(userId))
+                        .where(SocialUserAuthTableDef.SOCIAL_USER_AUTH.USER_ID.eq(userId))
+                , String.class);
+    }
+
+
+
 
 
     /**

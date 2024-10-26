@@ -1,10 +1,4 @@
-package cn.apimix;
-
-/**
- * @Author: Hor
- * @Date: 2024/8/27 下午9:53
- * @Version: 1.0
- */
+package cn.apimix.wx.utils;
 
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
@@ -18,10 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Redis 工具类
- *
- * @author Charles7c
- * @since 1.0.0
+ * @Author: Hor
+ * @Date: 2024/10/13 下午8:32
+ * @Version: 1.0
  */
 public class RedisUtils {
 

@@ -29,6 +29,11 @@ public class CacheConstants {
     public static final String CAPTCHA_KEY_PREFIX = "CAPTCHA" + DELIMITER;
 
     /**
+     * 微信登录
+     */
+    public static final String WX_CAPTCHA_KEY_PREFIX = "wxLoginCode" + DELIMITER;
+
+    /**
      * 用户缓存键前缀
      */
     public static final String USER_KEY_PREFIX = "USER" + DELIMITER;

@@ -12,9 +12,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @Date: 2024/6/13 14:02
  * @Version: 1.0
  */
+@SpringBootApplication
 @EnableDubbo
 @EnableDiscoveryClient
-@SpringBootApplication
 public class ApiMixGateWayApplication {
     public static void main(String[] args) {
         SpringApplication.run(ApiMixGateWayApplication.class, args);

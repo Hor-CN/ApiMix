@@ -115,9 +115,47 @@
 
     </dependencies>
 
+    <profiles>
+        <profile>
+            <!--	开发环境		-->
+            <id>dev</id>
+            <properties>
+                <profileActive>dev</profileActive>
+            </properties>
+            <!--	默认激活的环境		-->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profileActive>prod</profileActive>
+            </properties>
+        </profile>
+
+
+    </profiles>
 
         <!-- 构建 -->
         <build>
+            <resources>
+                <resource>
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <include>application-${profileActive}.yml</include>
+                        <include>application.yml</include>
+                        <include>**/*.xml</include>
+                    </includes>
+                    <filtering>true</filtering>
+                </resource>
+                <resource>
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.xml</include>
+                    </includes>
+                </resource>
+            </resources>
             <plugins>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>

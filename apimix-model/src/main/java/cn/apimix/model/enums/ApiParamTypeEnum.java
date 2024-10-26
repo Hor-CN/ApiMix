@@ -25,5 +25,4 @@ public enum ApiParamTypeEnum {
 
     @EnumValue
     private final String type;
-
 }

@@ -58,21 +58,18 @@ public class ApiAddRequest implements Serializable {
     /**
      * 接口分类
      */
-    @NotBlank(message = "接口分类不能为空")
     private Long category;
 
 
     /**
      * 是否收费
      */
-    @NotBlank(message = "是否收费不能为空")
     private Boolean isPaid;
 
 
     /**
      * 收费代理
      */
-    @NotBlank(message = "是否代理不能为空")
     private Boolean proxy;
 
     /**
