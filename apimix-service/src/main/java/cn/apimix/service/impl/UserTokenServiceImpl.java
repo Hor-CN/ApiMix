@@ -83,18 +83,25 @@ public class UserTokenServiceImpl extends ServiceImpl<UserTokenMapper, UserToken
         // 判断是否是当前用户的Token
         boolean exists = queryChain().where(
                 UserTokenTableDef.USER_TOKEN.ID.eq(editRequest.getId())
-                        .and(
-                                UserTokenTableDef.USER_TOKEN.USER_ID.eq(userId)
-                        )
+                        .and(UserTokenTableDef.USER_TOKEN.USER_ID.eq(userId))
         ).exists();
         Assert.isTrue(exists, "非法操作");
+
+        UserToken one = getOne(queryChain().where(
+                UserTokenTableDef.USER_TOKEN.ID.eq(editRequest.getId())
+                        .and(UserTokenTableDef.USER_TOKEN.USER_ID.eq(userId))));
+
+
         UserToken token = UserToken.builder()
                 .id(editRequest.getId())
                 .userId(userId)
-                .expired(editRequest.getExpired())
+                .tokenValue(one.getTokenValue())
+                .createTime(one.getCreateTime())
+                .updateTime(one.getUpdateTime())
+                .expired(editRequest.getIsExpired() ? editRequest.getExpired() : null)
                 .remark(editRequest.getRemark())
                 .build();
-        return updateById(token);
+        return updateById(token,false);
     }
 
     /**

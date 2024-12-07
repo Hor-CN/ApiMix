@@ -1,10 +1,11 @@
 package cn.apimix.controller;
 
-import cn.apimix.RedisUtils;
 import cn.apimix.common.resp.Result;
-import cn.apimix.config.CacheConstants;
 import cn.apimix.core.annotation.ResponseResult;
+import cn.apimix.core.config.RedisKeyConstants;
 import cn.apimix.core.core.model.IdRequest;
+import cn.apimix.core.utils.RedisUtils;
+import cn.apimix.model.dto.system.user.SysUserAddRequest;
 import cn.apimix.model.dto.user.*;
 import cn.apimix.model.entity.Audit;
 import cn.apimix.model.entity.Menu;
@@ -14,6 +15,7 @@ import cn.apimix.model.mapstruct.UserMapping;
 import cn.apimix.model.vo.user.UserLoginVo;
 import cn.apimix.model.vo.user.UserVo;
 import cn.apimix.service.impl.AuditServiceImpl;
+import cn.apimix.service.impl.CaptchaServiceImpl;
 import cn.apimix.service.impl.MenuServiceImpl;
 import cn.apimix.service.impl.UserServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,9 +58,10 @@ public class UserController {
     @Resource
     private AuditServiceImpl auditService;
 
+    @Resource
+    private CaptchaServiceImpl captchaService;
 
-    private static final String CAPTCHA_EXPIRED = "验证码已失效";
-    private static final String CAPTCHA_ERROR = "验证码错误";
+
 
     /**
      * 登录用户
@@ -67,17 +71,7 @@ public class UserController {
      */
     @PostMapping("login")
     public UserLoginVo login(@RequestBody @Valid UserLoginRequest loginRequest) {
-        // 验证码前缀
-        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + loginRequest.getUuid();
-        // 获取验证码
-        String captcha = RedisUtils.get(captchaKey);
-        // 验证码已失效
-        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
-        // 验证成功删除
-        RedisUtils.delete(captchaKey);
-        // 验证码是否相等
-        Assert.equals(loginRequest.getCaptcha(), captcha, CAPTCHA_ERROR);
-
+        captchaService.checkImageCaptcha(loginRequest.getUuid(), loginRequest.getCaptcha());
         Long userId = userService.login(loginRequest);
         return UserLoginVo.builder()
                 .id(String.valueOf(userId))
@@ -88,20 +82,32 @@ public class UserController {
     @PostMapping("/email")
     public UserLoginVo emailLogin(@Validated @RequestBody EmailLoginRequest loginReq) {
         String email = loginReq.getEmail();
-        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + email;
-        String captcha = RedisUtils.get(captchaKey);
-        // 验证码已失效
-        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
-        // 验证码是否相等
-        Assert.equals(loginReq.getCaptcha(), captcha, CAPTCHA_ERROR);
-        RedisUtils.delete(captchaKey);
-
+        captchaService.checkEmailCode(email, loginReq.getCaptcha());
         Long userId = userService.emailLogin(email);
-
         return UserLoginVo.builder()
                 .id(String.valueOf(userId))
                 .token(StpUtil.getTokenValue()).build();
     }
+
+    @PostMapping("/register")
+    public Boolean register(@Validated @RequestBody UserRegisterRequest registerReq) {
+        // 校验验证码
+        captchaService.checkEmailCode(registerReq.getEmail(), registerReq.getCaptcha());
+        // 校验密码
+        Assert.isTrue(registerReq.getPassWord().equals(registerReq.getRepeatPassword()), "两次密码不一致");
+
+        return userService.insertUser(SysUserAddRequest.builder()
+                .username(registerReq.getUserName())
+                .nickname(registerReq.getUserName())
+                .email(registerReq.getEmail())
+                .password(registerReq.getPassWord())
+                .status(1)
+                .description("还没有个性签名呢")
+                .roles(Collections.singletonList("user"))
+                .build());
+    }
+
+
 
     /**
      * 微信公众号验证码登录
@@ -112,15 +118,12 @@ public class UserController {
             @Validated
             WxLoginRequest loginRequest
     ) {
-
-        String captchaKey = CacheConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
+        String captchaKey = RedisKeyConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
         String uuid = RedisUtils.get(captchaKey);
         // 使用后删除
         RedisUtils.delete(captchaKey);
-
         // 验证码已失效
-        Assert.notBlank(uuid, CAPTCHA_EXPIRED);
-
+        Assert.notBlank(uuid, "验证码已失效");
         Long userId = userService.wxLogin(uuid);
 
         return UserLoginVo.builder()
@@ -203,13 +206,7 @@ public class UserController {
     @SaCheckLogin
     @PostMapping("/updateEmail")
     public void updateUserEmail(@Validated @RequestBody UserEmailUpdateRequest updateReq) {
-        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + updateReq.getEmail();
-        String captcha = RedisUtils.get(captchaKey);
-        // 验证码已失效
-        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
-        // 验证码是否相等
-        Assert.equals(updateReq.getCaptcha(), captcha, CAPTCHA_ERROR);
-        RedisUtils.delete(captchaKey);
+        captchaService.checkEmailCode(updateReq.getEmail(), updateReq.getCaptcha());
         userService.updateEmail(updateReq.getEmail(), updateReq.getOldPassword(), StpUtil.getLoginIdAsLong());
     }
 
@@ -219,15 +216,7 @@ public class UserController {
     @SaCheckLogin
     @PostMapping("/applyDeveloper")
     public Boolean applyDeveloper(@Validated @RequestBody ApplyDeveloperRequest request) {
-
-        String captchaKey = CacheConstants.CAPTCHA_KEY_PREFIX + request.getEmail();
-        String captcha = RedisUtils.get(captchaKey);
-        // 验证码已失效
-        Assert.notBlank(captcha, CAPTCHA_EXPIRED);
-        // 验证码是否相等
-        Assert.equals(request.getCaptcha(), captcha, CAPTCHA_ERROR);
-        RedisUtils.delete(captchaKey);
-
+        captchaService.checkEmailCode(request.getEmail(), request.getCaptcha());
         return auditService.insertAudit(Audit.builder()
                 .flowNo(StpUtil.getLoginIdAsLong())
                 .type(2)

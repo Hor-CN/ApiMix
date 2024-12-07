@@ -1,0 +1,11 @@
+# 镜像
+FROM mysql:5.7
+
+
+# 执行sql脚本
+ADD ./db/*.sql /docker-entrypoint-initdb.d/
+
+#docker-entrypoint-initdb.d 是一个特殊的目录，专用于 Docker 中的 MySQL 容器。
+#当使用 Docker 运行 MySQL 容器时，如果这个目录存在并且包含 SQL 脚本或其它可执行文件，
+#Docker 会在 MySQL 服务启动之初自动执行这些脚本。这一机制使得在首次启动容器时能够方便地进行一些初始化设置，
+#比如创建数据库、表、用户，以及导入数据等。

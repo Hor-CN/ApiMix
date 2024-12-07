@@ -1,0 +1,11 @@
+# 镜像
+FROM openjdk:8-jre-alpine
+# 作者
+MAINTAINER hor horcn@qq.com
+# 挂载目录
+VOLUME /app
+# 指定工作目录 不存在会自动创建
+WORKDIR /app
+# 复制jar文件到路径
+COPY ./jar/apimix-gateway-1.0-SNAPSHOT.jar /app/app.jar
+ENTRYPOINT ["java","-jar","app.jar"]

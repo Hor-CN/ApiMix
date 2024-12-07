@@ -45,7 +45,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         QueryWrapper queryWrapper = QueryWrapper.create()
                 .where(NoticeTableDef.NOTICE.TITLE.like(queryRequest.getTitle(), StringUtil::isNotBlank))
                 .and(NoticeTableDef.NOTICE.TYPE.eq(queryRequest.getType(), If::notNull))
-                .and(NoticeTableDef.NOTICE.STATUS.eq(queryRequest.getStatus(), If::notNull));
+                .and(NoticeTableDef.NOTICE.STATUS.eq(queryRequest.getStatus(), If::notNull))
+                .orderBy(NoticeTableDef.NOTICE.CREATE_TIME.desc());
         return page(page, queryWrapper);
     }
 

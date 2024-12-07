@@ -1,5 +1,6 @@
 package cn.apimix.model.dto.system.user;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -16,6 +17,7 @@ import java.util.List;
  * @Version: 1.0
  */
 @Data
+@Builder
 public class SysUserAddRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -46,6 +48,7 @@ public class SysUserAddRequest implements Serializable {
      */
     @NotBlank(message = "密码不能为空")
     private String password;
+
     /**
      * 性别
      */

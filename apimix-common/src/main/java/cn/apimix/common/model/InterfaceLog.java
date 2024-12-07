@@ -55,9 +55,9 @@ public class InterfaceLog implements Serializable {
     private String ip;
 
     /**
-     * IP所属城市
+     * IP所属地址
      */
-    private String city;
+    private String address;
 
     /**
      * 请求用户ID

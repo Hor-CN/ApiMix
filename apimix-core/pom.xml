@@ -44,6 +44,18 @@
             <artifactId>sa-token-spring-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redisson-jackson</artifactId>
+        </dependency>
+
+
+        <!-- 提供Redis连接池 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+
 
         <!-- 核心，包括Bean操作、日期、各种Util等 -->
         <dependency>
@@ -62,7 +74,7 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-extra</artifactId>
         </dependency>
-
+        
         <!-- 邮件 -->
         <dependency>
             <groupId>com.sun.mail</groupId>

@@ -1,7 +1,10 @@
 package cn.apimix.core.core.model;
 
 import cn.apimix.core.constant.CommonConstant;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -13,6 +16,8 @@ import javax.validation.constraints.NotNull;
  * @Version: 1.0
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PageRequest {
 
     /**
@@ -26,7 +31,7 @@ public class PageRequest {
      * 当前页码，从 1 开始
      */
     @NotNull(message = "pageNumber 页码不能为空")
-    @Min(value = 0,message = "pageNumber 页码必须大于等于0")
+    @Min(value = 1,message = "pageNumber 页码必须大于等于1")
     private Long pageNumber;
 
     /**

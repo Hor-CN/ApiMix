@@ -19,7 +19,7 @@ public class TokenAddRequest implements Serializable {
     /**
      * 过期时间（时间戳）
      */
-    private LocalDateTime expired;
+    private Date expired;
 
     /**
      * remark 备注

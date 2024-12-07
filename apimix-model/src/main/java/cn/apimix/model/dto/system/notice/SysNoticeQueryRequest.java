@@ -1,6 +1,7 @@
 package cn.apimix.model.dto.system.notice;
 
 import cn.apimix.core.core.model.PageRequest;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,6 +14,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
 public class SysNoticeQueryRequest extends PageRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 

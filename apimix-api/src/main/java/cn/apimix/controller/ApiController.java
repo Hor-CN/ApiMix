@@ -10,7 +10,7 @@ import cn.apimix.model.entity.ApiInfo;
 import cn.apimix.model.entity.AuditRecord;
 import cn.apimix.model.entity.Category;
 import cn.apimix.model.entity.UserPackage;
-import cn.apimix.model.vo.api.ApiItemVo;
+import cn.apimix.model.vo.api.ApiInfoVo;
 import cn.apimix.model.vo.api.ApiRelationVo;
 import cn.apimix.service.impl.*;
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -126,7 +126,6 @@ public class ApiController {
     /**
      * 获取当前开发者贡献的接口
      */
-
     @SaCheckLogin
     @GetMapping("count")
     public Long getUserDevApiByCount() {
@@ -155,7 +154,7 @@ public class ApiController {
      * @return 详情
      */
     @GetMapping("/{apiId}")
-    public ApiItemVo getApiInfo(@PathVariable Long apiId) {
+    public ApiInfoVo getApiInfo(@PathVariable Long apiId) {
         return apiService.selectApiInfoByApiId(apiId);
     }
 
@@ -167,6 +166,8 @@ public class ApiController {
      */
     @GetMapping("list")
     public Page<ApiInfo> getApiLists(@Valid ApiInfoQueryRequest page, Long categoryId) {
+
+
         return apiService.selectApiInfoByCategory(page, categoryId);
     }
 

@@ -25,7 +25,11 @@ public class TokenEditRequest implements Serializable {
     /**
      * 过期时间
      */
-    private LocalDateTime expired;
+    private Date expired;
+
+
+    private Boolean isExpired;
+
 
     /**
      * remark 备注

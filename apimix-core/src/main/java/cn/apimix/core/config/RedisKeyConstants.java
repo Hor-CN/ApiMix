@@ -1,4 +1,4 @@
-package cn.apimix.config;
+package cn.apimix.core.config;
 
 /**
  * @Author: Hor
@@ -11,7 +11,7 @@ package cn.apimix.config;
  * @author Charles7c
  * @since 2022/12/22 19:30
  */
-public class CacheConstants {
+public class RedisKeyConstants {
 
     /**
      * 分隔符
@@ -68,6 +68,6 @@ public class CacheConstants {
      */
     public static final String DATA_IMPORT_KEY = "SYSTEM" + DELIMITER + "DATA_IMPORT" + DELIMITER;
 
-    private CacheConstants() {
+    private RedisKeyConstants() {
     }
 }

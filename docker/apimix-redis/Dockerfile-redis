@@ -1,0 +1,10 @@
+# 镜像
+FROM redis:7.2.4
+# 作者
+MAINTAINER hor horcn@qq.com
+# 挂载目录
+VOLUME /app/redis
+# 指定路径
+WORKDIR /app/redis
+# 复制conf文件到路径
+COPY ./conf/redis.conf /app/redis/redis.conf

@@ -50,16 +50,16 @@ public class UserToken implements Serializable {
     /**
      * 过期时间
      */
-    private LocalDateTime expired;
+    private Date expired;
 
     /**
      * 创建时间（申请日期）
      */
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 更新时间
      */
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 }

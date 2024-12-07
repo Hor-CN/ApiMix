@@ -3,12 +3,14 @@ package cn.apimix.controller;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.model.dto.api.MonitorLineRequest;
 import cn.apimix.model.vo.api.ApiStatistics;
+import cn.apimix.model.vo.console.ChartDataVo;
 import cn.apimix.service.impl.ApiLogServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Author: Hor
@@ -29,8 +31,9 @@ public class SentinelController {
      */
     @SaCheckLogin
     @PostMapping("line")
-    public Object getMonitorLine(@RequestBody MonitorLineRequest request) {
+    public List<ChartDataVo> getMonitorLine(@RequestBody MonitorLineRequest request) {
         Long currentUserId = StpUtil.getLoginIdAsLong();
+
         return apiLogService.getMonitorLine(request.getId(), currentUserId, request.getStartTime(), request.getEndTime());
     }
 

@@ -4,7 +4,7 @@ import cn.apimix.model.dto.api.ApiAddRequest;
 import cn.apimix.model.dto.api.ApiEditRequest;
 import cn.apimix.model.dto.api.ApiInfoQueryRequest;
 import cn.apimix.model.entity.ApiInfo;
-import cn.apimix.model.vo.api.ApiItemVo;
+import cn.apimix.model.vo.api.ApiInfoVo;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 
@@ -29,7 +29,7 @@ public interface IApiService extends IService<ApiInfo> {
      * @param apiId 接口ID
      * @return 结果
      */
-    ApiItemVo selectApiInfoByApiId(Long apiId);
+    ApiInfoVo selectApiInfoByApiId(Long apiId);
 
     /**
      * 根据接口ID删除接口

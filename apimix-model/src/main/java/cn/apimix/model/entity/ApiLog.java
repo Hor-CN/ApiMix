@@ -71,9 +71,9 @@ public class ApiLog implements Serializable {
     private String ip;
 
     /**
-     * IP所属城市
+     * IP地址
      */
-    private String city;
+    private String address;
 
     /**
      * 请求用户ID

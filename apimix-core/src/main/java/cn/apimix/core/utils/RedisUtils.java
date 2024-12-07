@@ -1,4 +1,4 @@
-package cn.apimix;
+package cn.apimix.core.utils;
 
 /**
  * @Author: Hor

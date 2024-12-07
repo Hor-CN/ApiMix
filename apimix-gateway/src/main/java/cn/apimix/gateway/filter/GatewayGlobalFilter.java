@@ -1,9 +1,12 @@
 package cn.apimix.gateway.filter;
 
 import cn.apimix.common.model.InterfaceLog;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.dreamlu.mica.ip2region.core.Ip2regionSearcher;
+import net.dreamlu.mica.ip2region.core.IpInfo;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -13,6 +16,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import javax.annotation.Resource;
+
+import java.util.Objects;
+import java.util.Set;
 
 import static cn.apimix.gateway.filter.CacheBodyGatewayFilter.CACHE_REQUEST_BODY_OBJECT_KEY;
 import static cn.apimix.gateway.utils.NetUtils.getIp;
@@ -29,6 +37,8 @@ import static cn.apimix.gateway.utils.NetUtils.getPostRequestBody;
 @Slf4j
 public class GatewayGlobalFilter implements GlobalFilter, Ordered {
 
+    @Resource
+    private Ip2regionSearcher regionSearcher;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -40,9 +50,20 @@ public class GatewayGlobalFilter implements GlobalFilter, Ordered {
         log.info("本机地址：{}", request.getLocalAddress());
         log.info("客户端远程地址：{}", request.getRemoteAddress());
         log.info("接口请求IP：{}", getIp(request));
+        log.info("请求地点：{}", regionSearcher.getAddress(getIp(request)));
         log.info("请求参数：{}", request.getQueryParams());
         log.info("请求头：{}", request.getHeaders());
         Object cacheBody = exchange.getAttribute(CACHE_REQUEST_BODY_OBJECT_KEY);
+
+
+        IpInfo ipInfo = regionSearcher.memorySearch(getIp(request));
+        if (null == ipInfo) {
+            return null;
+        }
+        Set<String> regionSet = CollUtil.newLinkedHashSet(ipInfo.getCountry(), ipInfo.getRegion(), ipInfo
+                .getProvince(), ipInfo.getCity(), ipInfo.getIsp());
+        regionSet.removeIf(Objects::isNull);
+        String join = String.join("|", regionSet);
 
         InterfaceLog interfaceLog = InterfaceLog.builder()
                 .requestId(request.getId())
@@ -51,6 +72,7 @@ public class GatewayGlobalFilter implements GlobalFilter, Ordered {
                 .requestParams(JSONUtil.parseObj(request.getQueryParams(), false).toStringPretty())
                 .requestHeaders(JSONUtil.parseObj(request.getHeaders(), false).toStringPretty())
                 .ip(getIp(request))
+                .address(join)
                 .startTime(DateTime.now())
                 .build();
 

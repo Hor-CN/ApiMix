@@ -90,8 +90,16 @@ public class UserPackageServiceImpl extends ServiceImpl<UserPackageMapper, UserP
 
         Long allTotalQuota = list.stream().mapToLong(UserPackage::getTotalQuota).sum();
         Long allUsedQuota = list.stream().mapToLong(UserPackage::getUsedQuota).sum();
-        Long pastTotalQuota = list.stream().filter(data -> data.getExpiredTime().before(DateTime.now())).mapToLong(UserPackage::getTotalQuota).sum();
-        Long pastUsedQuota = list.stream().filter(data -> data.getExpiredTime().before(DateTime.now())).mapToLong(UserPackage::getUsedQuota).sum();
+        Long pastTotalQuota = list.stream()
+                // 过期的
+                .filter(data -> data.getExpiredTime().before(DateTime.now()))
+                .mapToLong(UserPackage::getTotalQuota)
+                .sum();
+        Long pastUsedQuota = list.stream()
+                // 过期的
+                .filter(data -> data.getExpiredTime().before(DateTime.now()))
+                .mapToLong(UserPackage::getUsedQuota)
+                .sum();
 
         return Quota.builder()
                 .allTotalQuota(allTotalQuota)

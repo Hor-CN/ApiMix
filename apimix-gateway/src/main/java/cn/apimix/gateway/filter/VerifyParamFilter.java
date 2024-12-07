@@ -58,7 +58,7 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
         }
 
         if (interfaceToken.getExpired() != null) {
-            if (interfaceToken.getExpired().toEpochSecond(ZoneOffset.of("+8")) <= LocalDateTimeUtil.now().toEpochSecond(ZoneOffset.of("+8"))) {
+            if (LocalDateTimeUtil.of(interfaceToken.getExpired()).toEpochSecond(ZoneOffset.of("+8")) <= LocalDateTimeUtil.now().toEpochSecond(ZoneOffset.of("+8"))) {
                 throw new BusinessException(403, "Token已过期");
             }
         }

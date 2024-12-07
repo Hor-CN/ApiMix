@@ -14,10 +14,7 @@ import cn.apimix.model.entity.table.CategoryApiTableDef;
 import cn.apimix.model.enums.ApiParamInEnum;
 import cn.apimix.model.enums.ApiParamPartEnum;
 import cn.apimix.model.mapstruct.ApiMapping;
-import cn.apimix.model.vo.api.ApiItemVo;
-import cn.apimix.model.vo.api.RequestParamsVo;
-import cn.apimix.model.vo.api.ResponseParamsVo;
-import cn.apimix.model.vo.api.SkuVo;
+import cn.apimix.model.vo.api.*;
 import cn.apimix.service.IApiService;
 import cn.hutool.core.lang.Assert;
 import com.mybatisflex.core.paginate.Page;
@@ -227,7 +224,7 @@ public class ApiServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> implemen
      * @return 结果
      */
     @Override
-    public ApiItemVo selectApiInfoByApiId(Long apiId) {
+    public ApiInfoVo selectApiInfoByApiId(Long apiId) {
         // 判断API是否存在
         boolean exists = queryChain().where(ApiInfoTableDef.API_INFO.ID.eq(apiId)).exists();
         Assert.isTrue(exists, "接口不存在");
@@ -281,10 +278,11 @@ public class ApiServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> implemen
         List<SkuVo> skuList = packageService.getSkuList(apiId);
 
 
-        ApiItemVo build = ApiItemVo.builder()
+        return ApiInfoVo.builder()
                 .id(apiInfo.getId())
                 .name(apiInfo.getName())
                 .logo(apiInfo.getLogo())
+                .url(apiInfo.getUrl())
                 .method(apiInfo.getMethod())
                 .isPaid(apiInfo.getIsPaid())
                 .proxy(apiInfo.getProxy())
@@ -300,13 +298,6 @@ public class ApiServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> implemen
                 .createTime(apiInfo.getCreateTime())
                 .updateTime(apiInfo.getUpdateTime())
                 .build();
-
-
-        if (!apiInfo.getProxy()) {
-            build.setUrl(apiInfo.getUrl());
-        }
-
-        return build;
     }
 
     /**
@@ -396,6 +387,27 @@ public class ApiServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> implemen
                         .and(ApiInfoTableDef.API_INFO.NAME.like(queryRequest.getName(), StringUtil::isNotBlank))
         );
     }
+
+
+    public Page<ApiItemVo> selectApiItemByCategory(ApiInfoQueryRequest queryRequest, Long categoryId) {
+
+        // 获取到分类的ID列表
+        List<Long> apiIds = categoryApiService.getMapper().selectListByQuery(
+                query().where(CategoryApiTableDef.CATEGORY_API.CATEGORY_ID.eq(categoryId))
+        ).stream().map(CategoryApi::getApiId).collect(Collectors.toList());
+
+
+        return mapper.paginateAs(
+                Page.of(queryRequest.getPageNumber(), queryRequest.getPageSize()),
+                query().where(ApiInfoTableDef.API_INFO.ID.in(apiIds))
+                        .and(ApiInfoTableDef.API_INFO.STATUS.eq(true))
+                        .and(ApiInfoTableDef.API_INFO.NAME.like(queryRequest.getName(), StringUtil::isNotBlank))
+                ,ApiItemVo.class);
+
+    }
+
+
+
 
     /**
      * 分页获取API接口列表当前开发者

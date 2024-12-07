@@ -1,7 +1,7 @@
 package cn.apimix.controller.system.user;
 
-import cn.apimix.RedisUtils;
-import cn.apimix.config.CacheConstants;
+import cn.apimix.core.utils.RedisUtils;
+import cn.apimix.core.config.RedisKeyConstants;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.core.model.PageRequest;
 import cn.apimix.model.dto.api.AuditAddRequest;
@@ -134,7 +134,7 @@ public class SysUserController {
     public Boolean unBindWxLogin(@RequestBody
                                  @Validated
                                  WxLoginRequest loginRequest) {
-        String captchaKey = CacheConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
+        String captchaKey = RedisKeyConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
         String uuid = RedisUtils.get(captchaKey);
         // 使用后删除
         RedisUtils.delete(captchaKey);
@@ -150,7 +150,7 @@ public class SysUserController {
     public Boolean bindWxLogin(@RequestBody
                                  @Validated
                                  WxLoginRequest loginRequest) {
-        String captchaKey = CacheConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
+        String captchaKey = RedisKeyConstants.WX_CAPTCHA_KEY_PREFIX + loginRequest.getCaptcha();
         String uuid = RedisUtils.get(captchaKey);
         // 使用后删除
         RedisUtils.delete(captchaKey);

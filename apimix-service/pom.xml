@@ -33,5 +33,16 @@
             <artifactId>apimix-model</artifactId>
         </dependency>
 
+        <!-- 验证码模块 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-captcha</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-json</artifactId>
+        </dependency>
+
+
     </dependencies>
 </project>
