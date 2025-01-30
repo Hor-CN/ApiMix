@@ -4,6 +4,7 @@ import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 启动类
@@ -12,6 +13,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @Date: 2024/5/20 22:25
  * @Version: 1.0
  */
+@EnableScheduling
 @EnableDubbo
 @EnableDiscoveryClient
 @SpringBootApplication

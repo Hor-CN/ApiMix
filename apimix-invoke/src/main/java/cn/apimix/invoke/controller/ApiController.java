@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Author: Hor
@@ -30,9 +31,6 @@ public class ApiController {
     @RequestMapping("/*")
     public ResponseEntity<Object> invokingApi(@RequestBody RequestParams requestParams) {
 
-
-        log.info("请求参数：{}", requestParams);
-
         // 请求参数
         Map<String, Object> query = MapUtil.newHashMap();
         requestParams.getQuery().forEach((field -> query.put(field.getName(), field.getValue().toString())));
@@ -40,6 +38,9 @@ public class ApiController {
         // 请求头
         Map<String, String> headers = MapUtil.newHashMap();
         requestParams.getHeader().forEach(field -> headers.put(field.getName(), field.getValue().toString()));
+        headers.remove("X-APIMix-Token");
+
+        log.info("请求参数：{}", requestParams);
 
         // 请求体
         Map<String, Object> body = MapUtil.newHashMap();

@@ -5,10 +5,8 @@ import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.common.model.InterfaceToken;
 import cn.apimix.common.model.InterfaceUser;
 import cn.apimix.common.service.InnerInterfaceService;
-import cn.apimix.core.exception.HorApiException;
 import cn.apimix.model.entity.*;
 import cn.apimix.service.impl.*;
-import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Component;
@@ -62,27 +60,26 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
     public Boolean invoke(Long apiId, String token, InterfaceLog interfaceLog) {
 
         try {
-            ApiInfo apiInfo = apiService.getById(apiId);
-            // 如果不收费，直接调用成功
-            if (!apiInfo.getIsPaid()) {
-                return true;
-            }
-
             // 根据 Token 获取信息
             UserToken userToken = tokenService.selectTokenByTokenValue(token);
+            // 当前套餐
+            Long currentPackageId;
+            // Token 分配的调用增加是否成功 api_token表
+            Boolean apiTokenIncrease = true;
+            // 判断该 Token 在此接口上是否分配次数
+            ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
+            // 如果被分配，那就使用分配的套餐
+            if (apiToken != null) {
+                // 分配的Token次数增加
+                apiTokenIncrease = apiTokenService.increaseTheNumberOfCalls(apiToken.getId());
+            }
 
             // 根据条件使用最适合的流量包【0】
             List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userToken.getUserId());
-            // 添加套餐的使用次数
-            Boolean packageIncrease = userPackageService.increaseTheNumberOfCalls(availablePackages.get(0).getId());
+            currentPackageId = availablePackages.get(0).getId();
 
-            ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
-            // 分配的token统计增加
-            Boolean apiTokenIncrease = true;
-            if (apiToken != null) {
-                apiTokenIncrease = apiTokenService.increaseTheNumberOfCalls(apiToken.getTokenId());
-            }
-
+            // 添加套餐的使用次数 user_package表
+            Boolean packageIncrease = userPackageService.increaseTheNumberOfCalls(currentPackageId);
             // 添加日志
             Boolean logIncrease = apiLogService.insertApiLog(interfaceLog);
             return packageIncrease && apiTokenIncrease && logIncrease;
@@ -127,6 +124,8 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
         }
         return InterfaceToken.builder()
                 .id(userToken.getId())
+                .name(userToken.getName())
+                .status(userToken.getStatus())
                 .userId(userToken.getUserId())
                 .tokenValue(userToken.getTokenValue())
                 .expired(userToken.getExpired())
@@ -169,8 +168,15 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
      */
     @Override
     public Boolean isInvoke(Long apiId, String token) {
+
         // 根据 Token 获取信息
         UserToken userToken = tokenService.selectTokenByTokenValue(token);
+
+        // Token是否禁用
+        if (!userToken.getStatus()) {
+            return false;
+        }
+
         // 根据 接口ID 获取信息
         ApiInfo apiInfo = apiService.getById(apiId);
 
@@ -192,22 +198,26 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
             return false;
         }
 
-        // 1. 判断Token是否有分配到此接口，有则判断此token在此接口上的限制次数
+        // 判断Token是否分配给此接口的流量包
         ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
-        // 未分配，没有可用次数返回false
-        if (apiToken != null && apiToken.getTotalQuota() < apiToken.getUsedQuota()) {
-            return false;
+
+        // 如果分配有
+        if (apiToken != null) {
+            // 没有可用次数返回false
+            if (apiToken.getTotalQuota() < apiToken.getUsedQuota()) {
+                return false;
+            }
         }
 
         UserApiRelation userApiRelation = relationService.selectApiRelation(apiId, userId);
-        // 禁用调用
+        // 是否禁用某用户调用此接口
         if (!userApiRelation.getStatus()) {
             return false;
         }
 
         // 获取可用套餐
         List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userId);
-
+        // 是否有可用套餐
         return !availablePackages.isEmpty();
 
     }

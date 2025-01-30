@@ -1,3 +1,4 @@
+import cn.apimix.model.enums.SocialSourceEnum;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
@@ -17,8 +18,9 @@ import java.util.List;
 public class test {
     public static void main(String[] args) {
 
-
-
+        System.out.println(SocialSourceEnum.WECHAT);
+        Date expirationTime = DateUtil.offset(DateUtil.date(), DateField.MINUTE, 5);
+        System.out.println(expirationTime);
 //        Date dateTime = DateUtil.parseDate("2024-07-26 17:52:08");
 //        System.out.println(DateTime.of(1722700800000L));
 //        System.out.println(dateTime.getTime());

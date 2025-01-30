@@ -17,7 +17,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableAsync //开启异步
 public class ThreadPoolConfig {
 
-    @Bean("threadPool")
+    @Bean("myThreadPool")
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         // 设置核心线程数

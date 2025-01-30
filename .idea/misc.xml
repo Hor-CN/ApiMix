@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="EntryPointsManager">
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="lombok.SneakyThrows" />
+    </list>
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/apimix-module/pom.xml" />
+        <option value="$PROJECT_DIR$/apimix-module/apimix-module-auth/pom.xml" />
+        <option value="$PROJECT_DIR$/apimix-module/apimix-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/apimix-framework/pom.xml" />
+        <option value="$PROJECT_DIR$/apimix-module/untitled/pom.xml" />
+        <option value="$PROJECT_DIR$/apimix-wx/pom.xml" />
       </set>
     </option>
   </component>

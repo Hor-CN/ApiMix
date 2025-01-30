@@ -14,7 +14,9 @@
     <artifactId>apimix-common</artifactId>
 
     <description>
-        common公共模块
+        应用概述： common 模块用于存放通用的工具类和公共配置，为整个项目提供共享的基础。
+        主要功能： 包含通用的工具方法、常量、公共配置等。
+        角色定位： 不包含具体的业务逻辑，主要为其他模块提供通用功能。
     </description>
     <dependencies>
         <dependency>

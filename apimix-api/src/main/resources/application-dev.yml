@@ -13,7 +13,7 @@ spring:
   # spring 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/apimix?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/apimix?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=false
     username: root
     password: 123456
     hikari:
@@ -47,9 +47,59 @@ spring:
     # 返回时间戳
     serialization:
       write-dates-as-timestamps: true
+    date-format: yyyy-MM-dd HH:mm:ss
+    locale: zh_CN
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: 5MB
 
 knife4j:
   enable: true
+
+
+--- ### minio 配置
+minio:
+  endpoint: http://192.168.0.15:9000
+  access-key: AVsPbQ0G4JkPE1ZV7B6c
+  secret-key: WvWJHMjI5z9ku8p73KiFyctSCInjbozJb6OQqQfx
+  bucket-name: apimix
+
+--- ### 支付宝配置
+alipay:
+  # 应用id
+  app-id: 2021005116616243
+  # 卖家id
+  seller-id: 2088822310860701
+  # 是否沙盒
+  sandbox: false
+  # 通知地址
+  notify-url: https://9861oald1011.vicp.fun/api/order/payNotify
+  returnUrl: http://localhost:8000/account/center
+  private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCRCkFuK73KEA6Kjldbr+YxWf5okebeaprjco6IqFIXORULSr8s6YI+EOYikQvZOPA906ZZPWqPeimA9lGdYvhG7ku24LIIiO62ytVKO0rlNMTpLb6aWZDBOKFXAO9m9lwMnuWzQXf/MDM2lnZoH6KEyCHYV0EVFkhS2bSffnL4rWTvQ4Omb5AGHKxwrBCyAov7TVVrGnkUqq52Yd/OaeOW9C8yADpZAA7qPOWnn6nsW8t/dzRsxm/hmpdsaFyeKoEtfywret3RF7uwwcrgBS1FXDNw4bXwvKz+W9atlvr5j7ajk4ODYwZWLudD25rDMfmDaWAT2uvb5U/7h52kTCDHAgMBAAECggEAGA5xZ8qNghRDtSuCxcxZC9p3XfTFLCLWad84UOZKJ1vqZ6MQLmzUk2LOKPGR24ecIUUXlDmhkQacF63DP62IrIsdt8lw/gVoQp1F3zgSZg3okxxpPsSYQ9QWvo2DJ7q47cb1JlQ3iPX/qJAwN3j3xbpEEtP2EX9Oo59EXCfm/ePUmOPAZJuOeZVEAOalNrbS8rK3YUVBW3W7sBECwJUNJHUF4NZdALtjIop7nJ2C8BZZlgfUuPgS9IVdKTpIxYJwcTryMzVjoYIMhony/exJwKcVANRGUkyO3OqEW3PxvTVBw0ee7swUJSprQZHOyAcG2W2fb1akjdtWwmi3TF1LcQKBgQDKRrnFG91R8+XMHeydJobDxSmRoi2QBMaqJticfe0phNDhvZvfQVNCF3A9Wrqh/G1wgBgIVvU42Z+4gnNJZfsrHh6fs6EuKAgF084fOeZdud94Ug7cGryJMCbN6/wQ1GZcwB0/NYTPjoshmEoqaD6DRYPzxTTbDNI+z4F+uf7n5QKBgQC3j+U7xwEkd8XLN7IqdRvv7gjF/7zB2zRwsodD77JuAzPf5f8jG//MEk1WOP25GQVZVwrjh3S1TEVAowjbpNIrWKKlecqL75Sty3c83iRIPtUaRM4RBq70nx6hdkggzbdvctr3VFgjoIgc/26TNvgy0/PQ5Qs+WEkUJTTaWzEDOwKBgBLfpIfKwMzbyA5SoHhNVve/VtCa5Ety1qKbu0xmx5E/LkpR6dBcBQu+qh9fbticeA2uNg/ZJUpnq+qIaX9ov5XXWp4mIZzv6Ue56pqpSWBnbn2IkpBhAkR+tLA0G7HqT57J4jC6qqi/MSYyUoFAdszC2LwPI45o1Nk9fWS4sBstAoGBAJdJk4bnB3wE8xIAP2lax8HBj52QnwOvJNNVcMJ/RbICFbkNGHDZXMPWucK8ifEKPCxb3u+T7o6V4+XX+S798vIixTpY3KTkusdakFWsSH76uixCVQwXVA7tLhOpJt1Sb0L9iJab/2CtqEEuDPZsMbfClIqwm8mwfdqKp7rnuceNAoGBAIx8erQlhtoAqV5pzCNEW5B86FOmqvSxCkr2SiqNWKXeYpIpZBOHyS9L++xZZdtnIkXblpVuSZORXCC4OCC3Se4uildn3ZG94TYFy35eoiVfpyl4a7d2bbewheh3X5pqkfEfs+4TsgAKrGtIPBzIMOa3o6/AbKNi/ipAjLdyzmzK
+  ali-pay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlsD/JUgTQskcZKHYfgeDcvbtlc942y8Z+6smOzbvSumuF0ExJmmqL2yOF7jG3jLr3r1h7uUDOarYXSY5eH/jLRYRdXAYFz0YeFd6fmV8ZrQQwbIIaBO5SCekSjBbBU7gmLZHe7C+GqokTtWRtMIpD2RQgYBN7Y8jVCx7cBPI7583U0sC2j+WqfqRmZETC60pzupBQz3rvjU7n2w40HxCkXsmFegWU7rRNJDG/3217MYSot8fxZXqjCxGbdIXt6THNUvCoUdPhj5nA5E22UJiNUgkGWh0j+xPojOQRgtCI0aey8x+4kuDtlAV7mlqWrezk4A/J5dZtfaWFPQSRtTxrwIDAQAB
+
+
+wx:
+  appid: wxbe2c81e45d85a623
+  appsecret: eaf83d388ef9b8c97b16bedb46f2ce07
+  app-token: ADR2otcIN4jpIIte
+
+--- ### Just Auth 配置
+justauth:
+  enabled: true
+  type:
+    GITEE:
+      client-id: a9d5486202bf0b6efcebbdc4f9cd544ff52a79425f35f2d5060142d0625bd419
+      client-secret: ab9de31c406b383d1a19949729900e6836d3f02825ca16e25f9eff9c8711bb92
+      redirect-uri: http://localhost:5173/social/callback?source=gitee
+    GITHUB:
+      client-id: Iv23liFGktejHKeW1PXT
+      client-secret: c06100938a450aecb552f126ec398ff63178ccbf
+      redirect-uri: http://localhost:5173/social/callback?source=github
+  cache:
+    type: REDIS
 
 
 # HikariCP连接池配置

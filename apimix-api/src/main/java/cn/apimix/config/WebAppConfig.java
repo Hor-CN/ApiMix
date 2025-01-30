@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+
+
 /**
  * @Author: Hor
  * @Date: 2024/5/22 22:37
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebAppConfig implements WebMvcConfigurer {
+
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -23,4 +26,6 @@ public class WebAppConfig implements WebMvcConfigurer {
         registry.addInterceptor(interceptor);
         WebMvcConfigurer.super.addInterceptors(registry);
     }
+
+
 }

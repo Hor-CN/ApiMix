@@ -4,6 +4,7 @@ import cn.apimix.common.resp.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.rpc.RpcException;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -38,11 +39,14 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
         }
         DataBufferFactory bufferFactory = response.bufferFactory();
         response.setStatusCode(HttpStatus.FORBIDDEN);
-        Result<Object> error = Result.buildFail(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+        Result<Object> error = Result.buildFail(HttpStatus.FORBIDDEN.value(), "网关异常，请联系管理员！");
         if (ex instanceof BusinessException) {
             BusinessException businessException = (BusinessException) ex;
             response.setStatusCode(HttpStatus.valueOf(businessException.getCode()));
-            error = Result.buildFail(businessException.getCode(), ex.getMessage());
+            error = Result.buildFail(businessException.getCode(), businessException.getMessage());
+        }
+        if (ex instanceof RpcException) {
+            error.setMessage("网关异常：RPC调用，请联系管理员！");
         }
 
         log.error("【网关异常】：{}", ex.toString());

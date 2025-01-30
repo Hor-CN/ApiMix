@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * @Author: Hor
@@ -24,6 +23,18 @@ public class InterfaceToken implements Serializable {
      */
     private Long userId;
 
+
+    /**
+     * 名称
+     */
+    private String name;
+
+    /**
+     * 状态
+     */
+    private Boolean status;
+
+
     /**
      * Token 值
      */
@@ -37,16 +48,16 @@ public class InterfaceToken implements Serializable {
     /**
      * 过期时间
      */
-    private Date expired;
+    private LocalDateTime expired;
 
     /**
      * 创建时间（申请日期）
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
 }

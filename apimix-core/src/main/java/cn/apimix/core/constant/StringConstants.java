@@ -42,6 +42,11 @@ public class StringConstants {
     public static final char C_CR = CharPool.CR;
 
     /**
+     * 管道符 {@code "|"}
+     */
+    public static final String PIPE = "|";
+
+    /**
      * 字符常量：换行符 {@code '\n'}
      */
     public static final char C_LF = CharPool.LF;

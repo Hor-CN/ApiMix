@@ -8,8 +8,12 @@
     <file url="file://$PROJECT_DIR$/apimix-framework/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apimix-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apimix-invoke/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/apimix-model/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/apimix-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apimix-module/apimix-module-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apimix-module/apimix-module-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apimix-module/apimix-module-model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apimix-module/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apimix-module/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apimix-module/untitled/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apimix-wx/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />

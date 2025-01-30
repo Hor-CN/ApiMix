@@ -18,10 +18,10 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for account
+-- Table structure for userAccount
 -- ----------------------------
-DROP TABLE IF EXISTS `account`;
-CREATE TABLE `account`  (
+DROP TABLE IF EXISTS `userAccount`;
+CREATE TABLE `userAccount`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '状态（0：正常，1：冻结）',
@@ -30,13 +30,13 @@ CREATE TABLE `account`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of account
+-- Records of userAccount
 -- ----------------------------
-INSERT INTO `account` VALUES (1, 18265100971000199, 0, 0);
-INSERT INTO `account` VALUES (2, 18525250253000139, 0, 0);
-INSERT INTO `account` VALUES (3, 22333370819000179, 0, 0);
-INSERT INTO `account` VALUES (4, 22497038442000130, 0, 0);
-INSERT INTO `account` VALUES (5, 36151022656000161, 0, 0);
+INSERT INTO `userAccount` VALUES (1, 18265100971000199, 0, 0);
+INSERT INTO `userAccount` VALUES (2, 18525250253000139, 0, 0);
+INSERT INTO `userAccount` VALUES (3, 22333370819000179, 0, 0);
+INSERT INTO `userAccount` VALUES (4, 22497038442000130, 0, 0);
+INSERT INTO `userAccount` VALUES (5, 36151022656000161, 0, 0);
 
 -- ----------------------------
 -- Table structure for api_example
@@ -319,7 +319,7 @@ CREATE TABLE `menu`  (
 -- Records of menu
 -- ----------------------------
 INSERT INTO `menu` VALUES (1, 0, '/console/analyse', 'Layout', '/console/analyse/index', 1, '仪表盘', '', 'icon-dashboard', 0, 0, 1, 1, 1, 0, 1, '', 1, NULL, NULL, '2023-12-07 21:36:54');
-INSERT INTO `menu` VALUES (2, 0, '/console/account', 'Layout', '', 1, '账户管理', '', 'IconUser', 0, 0, 1, 1, 1, 0, 5, '', 1, NULL, NULL, '2023-12-07 21:39:16');
+INSERT INTO `menu` VALUES (2, 0, '/console/userAccount', 'Layout', '', 1, '账户管理', '', 'IconUser', 0, 0, 1, 1, 1, 0, 5, '', 1, NULL, NULL, '2023-12-07 21:39:16');
 INSERT INTO `menu` VALUES (4, 0, '/console/system', 'Layout', 'noRedirect', 1, '系统管理', '', 'icon-settings', 0, 0, 1, 1, 0, 0, 7, '', 1, NULL, NULL, '2023-12-07 21:42:49');
 INSERT INTO `menu` VALUES (101, 1, '/console/analyse/index', 'console/analyse/index', '', 2, '统计', '', 'icon-computer', 0, 0, 1, 1, 0, 0, 0, '', 0, NULL, NULL, '2023-12-16 12:59:00');
 INSERT INTO `menu` VALUES (102, 4, '/console/system/user', 'console/system/user/index', '', 2, '用户管理', '', 'icon-user', 0, 0, 1, 1, 0, 0, 0, '', 1, NULL, NULL, '2023-12-07 21:49:23');
@@ -330,8 +330,8 @@ INSERT INTO `menu` VALUES (207, 0, '/console/visit-controll', 'Layout', '/consol
 INSERT INTO `menu` VALUES (208, 207, '/console/visit-controll/index', 'console/visit-controll/index', '', 2, '访问控制', '', 'IconThunderbolt', 0, 0, 1, 0, 0, 0, 0, '', 0, NULL, '', '2023-12-16 15:18:57');
 INSERT INTO `menu` VALUES (216, 0, '/console/data', 'Layout', '/console/data/index', 1, '数据中心', '', 'IconLayers', 0, 0, 1, 1, 1, 0, 2, NULL, 1, NULL, '', '2023-12-18 21:24:58');
 INSERT INTO `menu` VALUES (217, 216, '/console/data/index', 'console/data/api', '', 2, '我的API', '', 'IconRelation', 0, 0, 1, 1, 0, 0, 0, NULL, 1, NULL, '', '2023-12-18 21:36:35');
-INSERT INTO `menu` VALUES (218, 2, '/console/account/info', 'console/account/info/index', '', 2, '个人中心', '', 'IconUser', 0, 0, 1, 1, 0, 0, 0, NULL, 1, NULL, '', '2023-12-18 22:08:21');
-INSERT INTO `menu` VALUES (219, 2, '/console/account/authentication', 'console/account/developer/index', '', 2, '开发者认证', '', 'IconSafe', 0, 0, 1, 1, 0, 0, 1, NULL, 1, NULL, '', '2023-12-18 22:27:10');
+INSERT INTO `menu` VALUES (218, 2, '/console/userAccount/info', 'console/userAccount/info/index', '', 2, '个人中心', '', 'IconUser', 0, 0, 1, 1, 0, 0, 0, NULL, 1, NULL, '', '2023-12-18 22:08:21');
+INSERT INTO `menu` VALUES (219, 2, '/console/userAccount/authentication', 'console/userAccount/developer/index', '', 2, '开发者认证', '', 'IconSafe', 0, 0, 1, 1, 0, 0, 1, NULL, 1, NULL, '', '2023-12-18 22:27:10');
 INSERT INTO `menu` VALUES (221, 0, '/console/dev-center', 'Layout', '', 1, '开发者中心', '', 'IconCodeSandbox', 1, 0, 1, 1, 0, 0, 4, NULL, 1, NULL, '', '2023-12-25 13:04:01');
 INSERT INTO `menu` VALUES (223, 221, '/console/dev-center/index', 'console/dev-center/index', '', 2, '开发者中心', '', '', 1, 0, 1, 1, 0, 0, 0, NULL, 0, NULL, '', '2023-12-25 17:45:54');
 INSERT INTO `menu` VALUES (224, 102, '', '', '', 3, '用户查询', '', '', 0, 0, 1, 1, 0, 0, 0, NULL, 1, NULL, 'sys:user:list', '2024-01-01 19:53:16');

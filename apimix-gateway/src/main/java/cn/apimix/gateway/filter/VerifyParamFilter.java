@@ -62,6 +62,10 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
                 throw new BusinessException(403, "Token已过期");
             }
         }
+        // 接口是否禁用
+        if (!interfaceToken.getStatus()) {
+            throw new BusinessException(403, "Token已被禁用");
+        }
 
         InterfaceUser interfaceUser = innerInterfaceService.getUserByUserId(interfaceToken.getUserId());
         if (interfaceUser == null) {
@@ -84,7 +88,7 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
         }
 
         if (!innerInterfaceService.isInvoke(apiId, token)) {
-            throw new BusinessException(400, "请求超过次数限制");
+            throw new BusinessException(400, "请求超过次数限制或被禁用");
         }
 
         InterfaceLog interfaceLog = exchange.getAttribute("InterfaceLog");

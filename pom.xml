@@ -23,9 +23,9 @@
     <modules>
         <!-- 核心模块 -->
         <module>apimix-core</module>
-        <!-- 实体模块 -->
-        <module>apimix-model</module>
-        <module>apimix-service</module>
+
+        <module>apimix-module</module>
+
         <module>apimix-api</module>
         <!-- 公共模块 -->
         <module>apimix-common</module>
@@ -33,7 +33,6 @@
         <module>apimix-gateway</module>
         <!-- 接口调用模块 -->
         <module>apimix-invoke</module>
-        <module>apimix-wx</module>
     </modules>
 
     <!-- 配置属性 -->
@@ -53,8 +52,9 @@
 
         <apimix.common.version>1.0-SNAPSHOT</apimix.common.version>
         <apimix.core.version>1.0-SNAPSHOT</apimix.core.version>
-        <apimix.model.version>1.0-SNAPSHOT</apimix.model.version>
-        <apimix.service.version>1.0-SNAPSHOT</apimix.service.version>
+
+        <apimix.module.version>1.0-SNAPSHOT</apimix.module.version>
+
         <javax.mail.version>1.6.2</javax.mail.version>
 
         <dom4j.version>2.1.3</dom4j.version>
@@ -64,6 +64,8 @@
 
         <dubbo.version>3.0.9</dubbo.version>
         <nacos-client.version>2.2.0</nacos-client.version>
+
+        <just-auth.version>1.16.7</just-auth.version>
     </properties>
 
     <!-- 管理依赖版本 -->
@@ -83,20 +85,6 @@
                 <version>${apimix.common.version}</version>
             </dependency>
 
-            <!-- 实体模块 -->
-            <dependency>
-                <groupId>cn.apimix</groupId>
-                <artifactId>apimix-model</artifactId>
-                <version>${apimix.model.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.apimix</groupId>
-                <artifactId>apimix-service</artifactId>
-                <version>${apimix.model.version}</version>
-            </dependency>
-
-
 
             <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
             <dependency>
@@ -111,7 +99,6 @@
                 <artifactId>sa-token-redisson-jackson</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
-
 
             <!-- HikariCP 数据库连接池的依赖配置 -->
             <dependency>
@@ -220,6 +207,44 @@
                 <groupId>org.dom4j</groupId>
                 <artifactId>dom4j</artifactId>
                 <version>${dom4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>me.zhyd.oauth</groupId>
+                <artifactId>JustAuth</artifactId>
+                <version>1.16.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-ip2region</artifactId>
+                <version>2.7.18.8</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.xkcoding.justauth</groupId>
+                <artifactId>justauth-spring-boot-starter</artifactId>
+                <version>1.4.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>8.5.9</version>
+            </dependency>
+
+<!--            &lt;!&ndash; https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>com.alipay.sdk</groupId>-->
+<!--                <artifactId>alipay-sdk-java</artifactId>-->
+<!--                <version>4.40.44.ALL</version>-->
+<!--            </dependency>-->
+
+            <!--支付SDK-->
+            <dependency>
+                <groupId>com.github.javen205</groupId>
+                <artifactId>IJPay-AliPay</artifactId>
+                <version>2.9.11</version>
             </dependency>
 
         </dependencies>
