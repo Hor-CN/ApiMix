@@ -1,4 +1,11 @@
 server:
   port: 8091
 
-
+spring:
+  application:
+    name: apimix-invoke  # 必须与Gateway路由的uri一致
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.20.0.1:8848  # 确保与Gateway的Nacos地址一致
+      server-addr: 172.20.0.1:8848

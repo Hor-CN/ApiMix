@@ -1,16 +1,16 @@
 package cn.apimix.controller.system;
 
 import cn.apimix.core.annotation.ResponseResult;
-import cn.apimix.model.dto.system.menu.AssignMenuRequest;
-import cn.apimix.model.dto.system.role.SysRoleAddRequest;
-import cn.apimix.model.dto.system.role.SysRoleEditRequest;
-import cn.apimix.model.dto.system.role.SysRoleQueryRequest;
-import cn.apimix.model.entity.Role;
-import cn.apimix.model.mapstruct.RoleMapping;
+import cn.apimix.user.model.req.menu.AssignMenuRequest;
+import cn.apimix.user.model.req.role.SysRoleAddRequest;
+import cn.apimix.user.model.req.role.SysRoleEditRequest;
+import cn.apimix.user.model.req.role.SysRoleQueryRequest;
+import cn.apimix.user.model.entity.Role;
+import cn.apimix.user.model.mapstruct.RoleMapping;
 import cn.apimix.model.vo.role.RoleVo;
-import cn.apimix.service.impl.RoleMenuServiceImpl;
-import cn.apimix.service.impl.RoleServiceImpl;
-import cn.apimix.service.impl.UserRoleServiceImpl;
+import cn.apimix.user.service.impl.RoleMenuServiceImpl;
+import cn.apimix.user.service.impl.RoleServiceImpl;
+import cn.apimix.user.service.impl.UserRoleServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.bean.BeanUtil;

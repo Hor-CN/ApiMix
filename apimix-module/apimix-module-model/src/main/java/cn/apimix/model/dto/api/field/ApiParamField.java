@@ -1,7 +1,7 @@
 package cn.apimix.model.dto.api.field;
 
 import cn.apimix.model.enums.ApiParamInEnum;
-import cn.apimix.model.enums.ApiParamPartEnum;
+
 import cn.apimix.model.enums.ApiParamTypeEnum;
 import lombok.Data;
 
@@ -54,5 +54,5 @@ public class ApiParamField {
      * API参数属于那部分
      * response|request
      */
-    private ApiParamPartEnum part;
+    private Object part;
 }

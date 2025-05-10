@@ -1,27 +1,24 @@
 package cn.apimix.core.utils;
 
-/**
- * @Author: Hor
- * @Date: 2024/8/27 下午9:53
- * @Version: 1.0
- */
-
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import org.redisson.api.*;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * Redis 工具类
  *
- * @author Charles7c
- * @since 1.0.0
+ * @Author: Hor
+ * @Date: 2024/8/27 下午9:53
+ * @Version: 1.0
  */
 public class RedisUtils {
 
@@ -88,6 +85,31 @@ public class RedisUtils {
         list.addAllAsync(value);
         list.expireAsync(duration);
         batch.execute();
+    }
+
+    /**
+     * 根据key获取Set中的所有值
+     *
+     * @param key 键
+     * @return Set
+     */
+    public  static <T> Set<T> getSetList(String key) {
+        RSet<T> rSet = CLIENT.getSet(key);
+        return rSet.readAll();
+    }
+
+    /**
+     * 移除值为value的
+     *
+     * @param key    键
+     * @param values 值 可以是多个
+     * @return 移除的个数
+     */
+    public static Long sRemove(String key, Object... values) {
+        RSet<Object> set = CLIENT.getSet(key);
+        // 移除指定的值并返回移除的元素个数
+        int i = set.removeAllCounted(Arrays.asList(values));
+        return (long) i;
     }
 
     /**
@@ -173,6 +195,19 @@ public class RedisUtils {
     public static boolean exists(String key) {
         return CLIENT.getKeys().countExists(key) > 0;
     }
+
+
+    /**
+     * 根据value从一个set中查询,是否存在
+     *
+     * @param key   键
+     * @param value 值
+     * @return true 存在 false不存在
+     */
+    public static boolean sHasKey(String key, Object value) {
+        return CLIENT.getSet(key).contains(value);
+    }
+
 
     /**
      * 查询缓存列表

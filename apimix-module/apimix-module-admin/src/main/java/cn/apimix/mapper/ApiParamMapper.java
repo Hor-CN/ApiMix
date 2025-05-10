@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @Date: 2024/5/20 20:35
  * @Version: 1.0
  */
-@Mapper
+//@Mapper
 public interface ApiParamMapper extends BaseMapper<ApiParam> {
 
 }

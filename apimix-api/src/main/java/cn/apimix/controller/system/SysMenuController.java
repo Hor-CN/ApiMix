@@ -2,11 +2,11 @@ package cn.apimix.controller.system;
 
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.model.IdRequest;
-import cn.apimix.model.dto.system.menu.SysMenuAddRequest;
-import cn.apimix.model.dto.system.menu.SysMenuEditRequest;
-import cn.apimix.model.entity.Menu;
-import cn.apimix.model.mapstruct.MenuMapping;
-import cn.apimix.service.impl.MenuServiceImpl;
+import cn.apimix.user.model.req.menu.SysMenuAddRequest;
+import cn.apimix.user.model.req.menu.SysMenuEditRequest;
+import cn.apimix.user.model.entity.Menu;
+import cn.apimix.user.model.mapstruct.MenuMapping;
+import cn.apimix.user.service.impl.MenuServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;

@@ -1,13 +1,11 @@
 package cn.apimix.controller;
 
+import cn.apimix.api.service.PackageTypeService;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.model.dto.api.PurchaseApiRequest;
 import cn.apimix.model.entity.PackageType;
 import cn.apimix.model.vo.sku.SkuVo;
 import cn.apimix.service.impl.OrderServiceImpl;
-import cn.apimix.service.impl.PackageServiceImpl;
-import cn.apimix.service.impl.PackageTypeServiceImpl;
-import cn.apimix.service.impl.ProductOrderServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.web.bind.annotation.*;
@@ -24,28 +22,28 @@ import java.util.List;
 @ResponseResult
 @RequestMapping("/api/sku")
 public class SkuController {
-
-
+//
+//
+//    @Resource
+//    private PackageServiceImpl packageService;
+//
+//
     @Resource
-    private PackageServiceImpl packageService;
-
-
-    @Resource
-    private PackageTypeServiceImpl packageTypeService;
-
-
-    @Resource
-    private OrderServiceImpl orderService;
-
-    /**
-     * 根据接口ID获取SKU列表
-     */
-    @GetMapping("{id}")
-    public List<SkuVo> getSkuList(@PathVariable Long id) {
-        return packageService.getSkuList(id);
-    }
-
-
+    private PackageTypeService packageTypeService;
+//
+//
+//    @Resource
+//    private OrderServiceImpl orderService;
+//
+//    /**
+//     * 根据接口ID获取SKU列表
+//     */
+//    @GetMapping("{id}")
+//    public List<SkuVo> getSkuList(@PathVariable Long id) {
+//        return packageService.getSkuList(id);
+//    }
+//
+//
     /**
      * 获取套餐可选列表
      */
@@ -54,17 +52,17 @@ public class SkuController {
         return packageTypeService.getPackageTypeList();
     }
 
-
-    /**
-     * 购买套餐
-     */
-    @SaCheckLogin
-    @PostMapping("purchase")
-    public void purchase(@RequestBody PurchaseApiRequest purchaseApiRequest) {
-        // 获取当前用户ID
-        Long userId = StpUtil.getLoginIdAsLong();
-        orderService.createProductOrder(userId,purchaseApiRequest.getPackageId(), purchaseApiRequest.getCount());
-    }
-
+//
+//    /**
+//     * 购买套餐
+//     */
+//    @SaCheckLogin
+//    @PostMapping("purchase")
+//    public void purchase(@RequestBody PurchaseApiRequest purchaseApiRequest) {
+//        // 获取当前用户ID
+//        Long userId = StpUtil.getLoginIdAsLong();
+//        orderService.createProductOrder(userId,purchaseApiRequest.getPackageId(), purchaseApiRequest.getCount());
+//    }
+//
 
 }

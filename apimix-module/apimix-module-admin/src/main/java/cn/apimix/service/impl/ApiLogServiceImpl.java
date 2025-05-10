@@ -160,8 +160,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
         );
     }
 
-
-
     public List<ChartDataVo> getHotCountByUserId(Long userId,Integer rows) {
         return listAs(query().select(ApiLogTableDef.API_LOG.TARGET_NAME.as(ChartDataVo::getName),
                                 QueryMethods.count().as(ChartDataVo::getValue)
@@ -169,8 +167,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
                         .orderBy(QueryMethods.count(), false).limit(rows)
                 , ChartDataVo.class);
     }
-
-
 
     public List<ChartDataVo> getCountAddressByUserId(Long userId) {
         Map<String, Long> map = Collections.singletonMap("user_id", userId);
@@ -207,7 +203,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
         return list;
     }
 
-
     public List<ChartDataVo> getCountIpByUserId(Long userId) {
         // 获取当前日期
         LocalDate currentDate = LocalDate.now();
@@ -241,7 +236,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
         return count(queryChain().select(QueryMethods.distinct(ApiLogTableDef.API_LOG.IP)).where(ApiLogTableDef.API_LOG.USER_ID.eq(userId)));
     }
 
-
     public Long getCountIpByToday(Long userId) {
         return count(
                 queryChain().select(QueryMethods.distinct(ApiLogTableDef.API_LOG.IP))
@@ -252,7 +246,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
         );
     }
 
-
     public Long getCountIpByYesterday(Long userId) {
         return count(
                 queryChain().select(QueryMethods.distinct(ApiLogTableDef.API_LOG.IP))
@@ -262,7 +255,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
                         )
         );
     }
-
 
     public Long getCountMethodGetByUserId(Long userId) {
         return count(query().where(ApiLogTableDef.API_LOG.USER_ID.eq(userId)).and(ApiLogTableDef.API_LOG.REQUEST_METHOD.eq("GET")));
@@ -275,6 +267,7 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
     public Long getCountMethodPutByUserId(Long userId) {
         return count(query().where(ApiLogTableDef.API_LOG.USER_ID.eq(userId)).and(ApiLogTableDef.API_LOG.REQUEST_METHOD.eq("PUT")));
     }
+
     public Long getCountMethodDelByUserId(Long userId) {
         return count(query().where(ApiLogTableDef.API_LOG.USER_ID.eq(userId)).and(ApiLogTableDef.API_LOG.REQUEST_METHOD.eq("DELETE")));
     }
@@ -283,7 +276,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
         return count(query().where(ApiLogTableDef.API_LOG.USER_ID.eq(userId))
                 .and(ApiLogTableDef.API_LOG.REQUEST_METHOD.notIn("GET","POST","PUT","DELETE")));
     }
-
 
     /**
      * 获取总日志统计
@@ -325,9 +317,6 @@ public class ApiLogServiceImpl extends ServiceImpl<ApiLogMapper, ApiLog> impleme
                         .eq(DateUtil.yesterday().toString("yyyy-MM-dd"))
         ));
     }
-
-
-
 
     public ApiStatistics getApiStatisticsByUser(Long apiId, Long userId, Long startTime, Long endTime) {
         Long totalNumber = count(query()

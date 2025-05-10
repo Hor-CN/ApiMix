@@ -1,20 +1,22 @@
 package cn.apimix.controller.console;
 
+import cn.apimix.api.model.entity.ApiVersion;
+import cn.apimix.api.model.req.ApiQueryRequest;
+import cn.apimix.api.service.ApiReleaseService;
+import cn.apimix.api.service.ApiVersionService;
+import cn.apimix.audit.model.entity.table.AuditTableDef;
+import cn.apimix.audit.service.impl.AuditServiceImpl;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.model.PageRequest;
-import cn.apimix.model.dto.api.ApiInfoQueryRequest;
-import cn.apimix.model.dto.api.AuditAddRequest;
-import cn.apimix.model.entity.ApiInfo;
-import cn.apimix.model.entity.AuditRecord;
-import cn.apimix.model.entity.User;
-import cn.apimix.model.entity.UserRole;
-import cn.apimix.model.entity.table.UserRoleTableDef;
-import cn.apimix.model.mapstruct.UserMapping;
-import cn.apimix.model.vo.user.UserInfoResp;
-import cn.apimix.service.impl.ApiServiceImpl;
-import cn.apimix.service.impl.AuditServiceImpl;
-import cn.apimix.service.impl.UserRoleServiceImpl;
-import cn.apimix.service.impl.UserServiceImpl;
+import cn.apimix.audit.model.req.AuditAddRequest;
+import cn.apimix.audit.model.entity.AuditRecord;
+import cn.apimix.user.model.entity.User;
+import cn.apimix.user.model.entity.UserRole;
+import cn.apimix.user.model.entity.table.UserRoleTableDef;
+import cn.apimix.user.model.mapstruct.UserMapping;
+import cn.apimix.user.model.resp.user.UserInfoResp;
+import cn.apimix.user.service.impl.UserRoleServiceImpl;
+import cn.apimix.user.service.impl.UserServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
@@ -46,9 +48,9 @@ public class AuditController {
 
     private final UserMapping userMapping;
 
-    private final ApiServiceImpl apiService;
+    private final ApiReleaseService apiReleaseService;
 
-
+    private final ApiVersionService apiVersionService;
 
 
     /**
@@ -77,9 +79,27 @@ public class AuditController {
                 new QueryWrapper().where(UserRoleTableDef.USER_ROLE.USER_ID.eq(addRequest.getFlowNo()))
                         .and(UserRoleTableDef.USER_ROLE.ROLE_ID.eq(3))
         );
+
+        boolean auditExists = auditService.exists(new QueryWrapper()
+                .where(AuditTableDef.AUDIT.FLOW_NO.eq(addRequest.getFlowNo()))
+                .and(AuditTableDef.AUDIT.STATUS.eq(1))
+        );
+
         if (exists) {
+
+            if (auditExists) {
+                return auditService.updateAudit(
+                        addRequest.getFlowNo(),
+                        userId,
+                        addRequest.getStatus(),
+                        addRequest.getRemark()
+                );
+            }
+
             return false;
         }
+
+        // 分配角色
         userRoleService.save(UserRole.builder()
                 .userId(addRequest.getFlowNo())
                 .roleId(3)
@@ -100,9 +120,10 @@ public class AuditController {
     @SaCheckLogin
     @SaCheckPermission("sys:api:list")
     @GetMapping("apis")
-    public Page<ApiInfo> getAuditApiByPage(@Valid ApiInfoQueryRequest queryRequest) {
-        return apiService.selectAuditApiInfoByPage(queryRequest);
+    public Page<ApiVersion> getAuditApiByPage(@Valid ApiQueryRequest queryRequest) {
+        return apiVersionService.getApiVersionByAudit(queryRequest,1);
     }
+
 
     /**
      * 修改审核
@@ -112,14 +133,15 @@ public class AuditController {
     @PostMapping("passApi")
     public Boolean addAudit(@RequestBody @Valid AuditAddRequest addRequest) {
         Long userId = StpUtil.getLoginIdAsLong();
+        ApiVersion apiVersion = apiVersionService.getById(addRequest.getFlowNo());
         // 如果是通过审核将接口修改为上线
-        apiService.onLineOrOffLine(addRequest.getFlowNo(), addRequest.getStatus() == 2);
-        return auditService.updateAudit(
+        auditService.updateAudit(
                 addRequest.getFlowNo(),
                 userId,
                 addRequest.getStatus(),
                 addRequest.getRemark()
         );
+        return apiReleaseService.updateStatusByOnlineOrOffLine(apiVersion.getApiId(), userId,addRequest.getStatus() == 2);
     }
 
 

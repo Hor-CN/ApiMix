@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.apimix</groupId>
+        <artifactId>apimix-module</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <name>apimix-module-comment</name>
+    <artifactId>apimix-module-comment</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <description>
+        评论模块：独立管理评论功能，包括评论发布、审核、展示等业务逻辑。
+    </description>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-model</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-user</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+        </dependency>
+
+        <!-- mapStruct-lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- IP 地理信息 -->
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-ip2region</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

@@ -1,7 +1,6 @@
 package cn.apimix.model.entity;
 
 import cn.apimix.model.enums.ApiParamInEnum;
-import cn.apimix.model.enums.ApiParamPartEnum;
 import cn.apimix.model.enums.ApiParamTypeEnum;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -53,7 +52,7 @@ public class ApiParam implements Serializable {
      * API参数属于那部分
      * response|request
      */
-    private ApiParamPartEnum part;
+    private Object part;
 
     /**
      * 参数名

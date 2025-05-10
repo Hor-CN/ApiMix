@@ -18,6 +18,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/apimix-framework/pom.xml" />
+        <option value="$PROJECT_DIR$/apimix-module/apimix-module.audit/pom.xml" />
         <option value="$PROJECT_DIR$/apimix-module/untitled/pom.xml" />
         <option value="$PROJECT_DIR$/apimix-wx/pom.xml" />
       </set>

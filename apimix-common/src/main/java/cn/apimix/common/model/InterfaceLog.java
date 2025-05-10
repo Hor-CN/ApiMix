@@ -64,7 +64,6 @@ public class InterfaceLog implements Serializable {
      */
     private Long userId;
 
-
     /**
      * 请求头
      */

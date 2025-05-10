@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.List;
@@ -60,12 +61,10 @@ public class ApiAddRequest implements Serializable {
      */
     private Long category;
 
-
     /**
      * 是否收费
      */
     private Boolean isPaid;
-
 
     /**
      * 收费代理
@@ -91,5 +90,16 @@ public class ApiAddRequest implements Serializable {
      * 返回示例
      */
     private List<ApiExampleField> result;
+
+    /**
+     * 接口版本
+     */
+    @NotBlank(message = "接口版本不能为空")
+    private String version;
+
+    /**
+     * 版本介绍
+     */
+    private String versionDescription;
 
 }

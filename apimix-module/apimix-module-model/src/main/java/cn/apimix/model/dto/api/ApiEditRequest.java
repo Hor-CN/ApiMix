@@ -1,9 +1,8 @@
 package cn.apimix.model.dto.api;
 
 import cn.apimix.model.dto.api.field.SkuField;
-import cn.apimix.model.entity.ApiExample;
-import cn.apimix.model.vo.api.RequestParamsVo;
-import cn.apimix.model.vo.api.ResponseParamsVo;
+//import cn.apimix.model.vo.api.RequestParamsVo;
+//import cn.apimix.model.vo.api.ResponseParamsVo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -71,17 +70,17 @@ public class ApiEditRequest implements Serializable {
     /**
      * 请求参数
      */
-    private RequestParamsVo request;
+    private Object request;
 
     /**
      * 响应参数
      */
-    private ResponseParamsVo response;
+    private Object response;
 
     /**
      * 响应示例
      */
-    private List<ApiExample> result;
+//    private List<ApiExample> result;
 
     /**
      * 添加套餐

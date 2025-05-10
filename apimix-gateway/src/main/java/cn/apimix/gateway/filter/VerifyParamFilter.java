@@ -16,6 +16,7 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -44,6 +45,12 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
         HttpHeaders headers = request.getHeaders();
         // 获取Token信息
         String token = headers.getFirst("X-APIMix-Token");
+
+        MultiValueMap<String, String> queryParams = request.getQueryParams();
+        if (queryParams.containsKey("X-APIMix-Token")) {
+            token = queryParams.getFirst("X-APIMix-Token");
+        }
+
         // 请求头中参数必须完整
         if (token == null) {
             throw new BusinessException(403, "Token不能为空");
@@ -83,9 +90,12 @@ public class VerifyParamFilter implements Ordered, GlobalFilter {
         if (!interfaceInfo.getStatus()) {
             throw new BusinessException(400, "接口未开启");
         }
-        if (!interfaceInfo.getProxy() || !interfaceInfo.getIsPaid()) {
-            throw new BusinessException(400, "免费或未代理接口");
+
+        // 如果未代理接口
+        if (!interfaceInfo.getProxy()) {
+            throw new BusinessException(400, "未此代理接口，请联系作者");
         }
+
 
         if (!innerInterfaceService.isInvoke(apiId, token)) {
             throw new BusinessException(400, "请求超过次数限制或被禁用");

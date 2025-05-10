@@ -17,6 +17,7 @@ import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.factory.rewrite.RewriteFunction;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -40,7 +41,7 @@ public class RequestRewriteService implements RewriteFunction<byte[], byte[]> {
     @Override
     public Publisher<byte[]> apply(ServerWebExchange exchange, byte[] body) {
         ServerHttpRequest request = exchange.getRequest();
-
+        InterfaceLog interfaceLog = exchange.getAttribute("InterfaceLog");
         // 请求的接口ID
         Long apiId = NetUtils.convertApiId(request);
 
@@ -49,13 +50,18 @@ public class RequestRewriteService implements RewriteFunction<byte[], byte[]> {
         // 构建请求参数
         RequestParams requestParams = RequestParams.builder()
                 .url(interfaceInfo.getUrl())
-                // 请求方式
-                .method(request.getMethodValue()).build();
+                .build();
+        if (interfaceLog != null) {
+            requestParams.setMethod(interfaceLog.getRequestMethod());
+        } else {
+            requestParams.setMethod(interfaceInfo.getMethod());
+        }
+
         List<ApiParamField> querys = new ArrayList<>();
         // 请求查询参数
         request.getQueryParams().forEach((k, v) -> {
-            ApiParamField field = ApiParamField.builder().name(k).build();
 
+            ApiParamField field = ApiParamField.builder().name(k).build();
             if (v.size() > 1) {
                 field.setType(ApiParamTypeEnum.ARRAY);
             } else {
@@ -66,14 +72,19 @@ public class RequestRewriteService implements RewriteFunction<byte[], byte[]> {
                 }
             }
             field.setValue(String.join(",", v));
-            querys.add(field);
+            if (!"X-APIMix-Token".equals(k)) {
+                querys.add(field);
+            }
         });
 
         // 请求头
         List<ApiParamField> headers = new ArrayList<>();
         request.getHeaders().forEach((k, v) -> {
-            ApiParamField field = ApiParamField.builder().name(k).value(String.join(",", v)).build();
-            if (!"Host".equals(k)) {
+            ApiParamField field = ApiParamField.builder()
+                    .name(k)
+                    .value(String.join(",", v))
+                    .build();
+            if (!"Host".equals(k) && !"X-APIMix-Token".equals(k)) {
                 headers.add(field);
             }
         });
@@ -94,7 +105,7 @@ public class RequestRewriteService implements RewriteFunction<byte[], byte[]> {
         JSONObject newRequest = JSONUtil.parseObj(requestParams);
 
 
-        InterfaceLog interfaceLog = exchange.getAttribute("InterfaceLog");
+
         if (interfaceLog != null) {
             interfaceLog.setTargetServer(apiId);
             interfaceLog.setTargetName(interfaceInfo.getName());

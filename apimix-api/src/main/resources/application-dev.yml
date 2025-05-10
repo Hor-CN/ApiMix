@@ -13,9 +13,9 @@ spring:
   # spring 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/apimix?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=false
+    url: jdbc:mysql://127.0.0.1:3306/apimix?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=false
     username: root
-    password: 123456
+    password: nasmysql
     hikari:
       pool-name: hikariCP
       # redis配置
@@ -23,7 +23,7 @@ spring:
     # Redis数据库索引（默认为0）
     database: 1
     # Redis服务器地址
-    host: 127.0.0.1
+    host: 172.16.2.3
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
@@ -58,7 +58,9 @@ spring:
 knife4j:
   enable: true
 
-
+## 头像支持格式配置
+avatar:
+  support-suffix: jpg,jpeg,png,gif
 --- ### minio 配置
 minio:
   endpoint: http://192.168.0.15:9000
@@ -101,7 +103,6 @@ justauth:
   cache:
     type: REDIS
 
-
 # HikariCP连接池配置
 
 # Sa-Token 配置 (文档: https://sa-token.cc)
@@ -131,4 +132,8 @@ dubbo:
     port: -1
     name: dubbo
   registry:
-    address: nacos://127.0.0.1:8848
+    address: nacos://172.16.2.3:8848
+spring:
+  cloud:
+    nacos:
+      server-addr: 172.16.2.3:8848

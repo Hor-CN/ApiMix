@@ -22,7 +22,6 @@
             <artifactId>apimix-common</artifactId>
         </dependency>
 
-
         <!-- 核心模块 -->
         <dependency>
             <groupId>cn.apimix</groupId>
@@ -34,13 +33,40 @@
             <groupId>cn.apimix</groupId>
             <artifactId>apimix-module-model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-
         </dependency>
 
         <!-- 服务模块 -->
         <dependency>
             <groupId>cn.apimix</groupId>
             <artifactId>apimix-module-admin</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- 评论模块 -->
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-comment</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- 审核模块 -->
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-audit</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-user</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
@@ -113,13 +139,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>cn.apimix</groupId>
-            <artifactId>apimix-module-auth</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
     </dependencies>
 
     <profiles>
@@ -140,7 +159,12 @@
                 <profileActive>prod</profileActive>
             </properties>
         </profile>
-
+        <profile>
+            <id>nas</id>
+            <properties>
+                <profileActive>nas</profileActive>
+            </properties>
+        </profile>
 
     </profiles>
 

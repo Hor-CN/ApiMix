@@ -27,10 +27,22 @@
             <artifactId>apimix-common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-user</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- 实体模块 -->
         <dependency>
             <groupId>cn.apimix</groupId>
             <artifactId>apimix-module-model</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.apimix</groupId>
+            <artifactId>apimix-module-audit</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

@@ -1,5 +1,12 @@
 package cn.apimix.provider;
 
+import cn.apimix.api.model.entity.ApiRelease;
+import cn.apimix.api.model.entity.ApiVersion;
+import cn.apimix.api.model.entity.UserPackage;
+import cn.apimix.api.model.resp.ApiReleaseResp;
+import cn.apimix.api.service.ApiVersionService;
+import cn.apimix.api.service.impl.ApiReleaseServiceImpl;
+import cn.apimix.api.service.impl.UserPackageServiceImpl;
 import cn.apimix.common.model.InterfaceInfo;
 import cn.apimix.common.model.InterfaceLog;
 import cn.apimix.common.model.InterfaceToken;
@@ -7,6 +14,8 @@ import cn.apimix.common.model.InterfaceUser;
 import cn.apimix.common.service.InnerInterfaceService;
 import cn.apimix.model.entity.*;
 import cn.apimix.service.impl.*;
+import cn.apimix.user.model.entity.User;
+import cn.apimix.user.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Component;
@@ -26,7 +35,10 @@ import java.util.List;
 public class InnerInterfaceServiceImpl implements InnerInterfaceService {
 
     @Resource
-    private ApiServiceImpl apiService;
+    private ApiVersionService apiVersionService;
+
+    @Resource
+    private ApiReleaseServiceImpl apiReleaseService;
 
     @Resource
     private UserTokenServiceImpl tokenService;
@@ -55,40 +67,48 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
      * @param token 调用此接口的Token
      * @return boolean 扣费结果
      */
-    @Transactional
-    @Override
-    public Boolean invoke(Long apiId, String token, InterfaceLog interfaceLog) {
+@Transactional
+@Override
+public Boolean invoke(Long apiId, String token, InterfaceLog interfaceLog) {
 
-        try {
-            // 根据 Token 获取信息
-            UserToken userToken = tokenService.selectTokenByTokenValue(token);
-            // 当前套餐
-            Long currentPackageId;
-            // Token 分配的调用增加是否成功 api_token表
-            Boolean apiTokenIncrease = true;
-            // 判断该 Token 在此接口上是否分配次数
-            ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
-            // 如果被分配，那就使用分配的套餐
-            if (apiToken != null) {
-                // 分配的Token次数增加
-                apiTokenIncrease = apiTokenService.increaseTheNumberOfCalls(apiToken.getId());
-            }
+    try {
+        // 根据 Token 获取信息
+        UserToken userToken = tokenService.selectTokenByTokenValue(token);
+        // 当前套餐
+        Long currentPackageId;
+        // Token 分配的调用增加是否成功 api_token表
+        Boolean apiTokenIncrease = true;
+        // 判断该 Token 在此接口上是否分配次数
+        ApiToken apiToken = apiTokenService.getApiTokenByTokenIdAndApiId(userToken.getId(), apiId);
+        // 如果被分配，那就使用分配的套餐
+        if (apiToken != null) {
+            // 分配的Token次数增加
+            apiTokenIncrease = apiTokenService.increaseTheNumberOfCalls(apiToken.getId());
+        }
 
+        Boolean packageIncrease = true;
+
+        ApiRelease apiRelease = apiReleaseService.getById(apiId);
+        ApiVersion apiVersion = apiVersionService.getById(apiRelease.getCurrentVersionId());
+
+        // 收费接口才使用流量包
+        if (apiVersion.getIsPaid()) {
             // 根据条件使用最适合的流量包【0】
             List<UserPackage> availablePackages = userPackageService.getAvailablePackages(apiId, userToken.getUserId());
             currentPackageId = availablePackages.get(0).getId();
-
             // 添加套餐的使用次数 user_package表
-            Boolean packageIncrease = userPackageService.increaseTheNumberOfCalls(currentPackageId);
-            // 添加日志
-            Boolean logIncrease = apiLogService.insertApiLog(interfaceLog);
-            return packageIncrease && apiTokenIncrease && logIncrease;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return false;
+            packageIncrease = userPackageService.increaseTheNumberOfCalls(currentPackageId);
         }
 
+        // 添加日志
+        Boolean logIncrease = apiLogService.insertApiLog(interfaceLog);
+        return packageIncrease && apiTokenIncrease && logIncrease;
+    } catch (Exception e) {
+        log.error(e.getMessage(), e);
+        return false;
     }
+
+}
 
     /**
      * 获取调用用户信息
@@ -143,19 +163,18 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
      */
     @Override
     public InterfaceInfo getInterfaceInfo(Long apiId) {
-        ApiInfo apiInfo = apiService.getById(apiId);
-
+        ApiRelease apiRelease = apiReleaseService.getById(apiId);
+        ApiVersion apiVersion = apiVersionService.getById(apiRelease.getCurrentVersionId());
         return InterfaceInfo.builder()
-                .id(apiInfo.getId())
-                .userId(apiInfo.getUserId())
-                .name(apiInfo.getName())
-                .url(apiInfo.getUrl())
-                .proxy(apiInfo.getProxy())
-                .isPaid(apiInfo.getIsPaid())
-                .method(apiInfo.getMethod())
-                .status(apiInfo.getStatus())
-                .createTime(apiInfo.getCreateTime())
-                .updateTime(apiInfo.getUpdateTime())
+                .id(apiRelease.getId())
+                .userId(apiVersion.getUserId())
+                .name(apiVersion.getName())
+                .url(apiVersion.getUrl())
+                .proxy(apiVersion.getProxy())
+                .isPaid(apiVersion.getIsPaid())
+                .method(apiVersion.getMethod())
+                .status(apiRelease.getStatus())
+                .createTime(apiRelease.getCreateTime())
                 .build();
     }
 
@@ -178,15 +197,16 @@ public class InnerInterfaceServiceImpl implements InnerInterfaceService {
         }
 
         // 根据 接口ID 获取信息
-        ApiInfo apiInfo = apiService.getById(apiId);
+        ApiRelease apiRelease = apiReleaseService.getById(apiId);
+        ApiVersion apiVersion = apiVersionService.getById(apiRelease.getCurrentVersionId());
 
         // 未代理接口无法调用
-        if (!apiInfo.getProxy()) {
+        if (!apiVersion.getProxy()) {
             return false;
         }
 
         // 如果不收费
-        if (!apiInfo.getIsPaid()) {
+        if (!apiVersion.getIsPaid()) {
             return true;
         }
 

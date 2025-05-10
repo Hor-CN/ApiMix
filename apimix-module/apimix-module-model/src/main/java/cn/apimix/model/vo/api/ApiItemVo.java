@@ -1,6 +1,6 @@
 package cn.apimix.model.vo.api;
 
-import cn.apimix.model.entity.Category;
+//import cn.apimix.model.entity.Category;
 import lombok.Builder;
 import lombok.Data;
 
@@ -43,7 +43,7 @@ public class ApiItemVo {
      */
     private String description;
 
-    private List<Category> categories;
+//    private List<Category> categories;
 
     /**
      * 返回类型

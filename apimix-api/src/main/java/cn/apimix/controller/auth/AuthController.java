@@ -1,39 +1,35 @@
 package cn.apimix.controller.auth;
 
-import cn.apimix.auth.config.WxGzhConfig;
-import cn.apimix.auth.handler.wx.WxChatMsgFactory;
-import cn.apimix.auth.handler.wx.WxChatMsgHandler;
-import cn.apimix.auth.model.req.LoginReq;
-import cn.apimix.auth.model.resp.LoginResp;
-import cn.apimix.auth.model.resp.SocialAuthAuthorizeResp;
-import cn.apimix.auth.service.AuthService;
-import cn.apimix.auth.utils.MessageUtil;
-import cn.apimix.auth.utils.SHA1;
 import cn.apimix.common.resp.Result;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.exception.HorApiException;
-import cn.apimix.model.entity.Role;
-import cn.apimix.model.entity.User;
-import cn.apimix.model.mapstruct.UserMapping;
-import cn.apimix.model.vo.RouteResp;
-import cn.apimix.model.vo.user.UserInfoResp;
-import cn.apimix.service.UserService;
+import cn.apimix.user.model.entity.Role;
+import cn.apimix.user.model.entity.User;
+import cn.apimix.user.model.mapstruct.UserMapping;
+import cn.apimix.user.model.req.LoginReq;
+import cn.apimix.user.model.req.UserRegisterRequest;
+import cn.apimix.user.model.req.system.SysUserAddRequest;
+import cn.apimix.user.model.resp.LoginResp;
+import cn.apimix.user.model.resp.RouteResp;
+import cn.apimix.user.model.resp.SocialAuthAuthorizeResp;
+import cn.apimix.user.model.resp.user.UserInfoResp;
+import cn.apimix.user.service.AuthService;
+import cn.apimix.user.service.UserService;
+import cn.apimix.user.service.impl.CaptchaServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.lang.Assert;
 import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -43,8 +39,8 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @ResponseResult
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -55,6 +51,29 @@ public class AuthController {
     private final AuthService authService;
 
     private final AuthRequestFactory authRequestFactory;
+
+    private final CaptchaServiceImpl captchaService;
+
+
+    @PostMapping("/register")
+    public Boolean register(@Validated @RequestBody UserRegisterRequest registerReq) {
+        // 校验验证码
+        captchaService.checkEmailCode(registerReq.getEmail(), registerReq.getCaptcha());
+        // 校验密码
+        Assert.isTrue(registerReq.getPassWord().equals(registerReq.getRepeatPassword()), "两次密码不一致");
+
+        return userService.insertUser(SysUserAddRequest.builder()
+                .username(registerReq.getUserName())
+                .nickname(registerReq.getUserName())
+                .email(registerReq.getEmail())
+                .password(registerReq.getPassWord())
+                .status(1)
+                .description("还没有个性签名呢")
+                .roleIds(Collections.singletonList(4))
+                .build());
+    }
+
+
 
     @PostMapping("/login")
     public LoginResp login(@Validated @RequestBody LoginReq req, HttpServletRequest request) {
@@ -75,65 +94,12 @@ public class AuthController {
     @GetMapping("/{source}")
     public SocialAuthAuthorizeResp authorize(@PathVariable String source) {
         AuthRequest authRequest = this.getAuthRequest(source);
+        String authorize = authRequest.authorize(AuthStateUtils.createState());
+        log.info("第三方登录地址获取：{}", authorize);
         return SocialAuthAuthorizeResp.builder()
-                .authorizeUrl(authRequest.authorize(AuthStateUtils.createState()))
+                .authorizeUrl(authorize)
                 .build();
     }
-
-
-    @Resource
-    private WxGzhConfig wxGzhConfig;
-
-    @Resource
-    private WxChatMsgFactory wxChatMsgFactory;
-
-
-    /**
-     * 回调消息校验
-     */
-    @GetMapping("wxCallback")
-    public String callback(@RequestParam("signature") String signature,
-                           @RequestParam("timestamp") String timestamp,
-                           @RequestParam("nonce") String nonce,
-                           @RequestParam("echostr") String echostr) {
-        log.info("get验签请求参数：signature:{}，timestamp:{}，nonce:{}，echostr:{}",
-                signature, timestamp, nonce, echostr);
-        String shaStr = SHA1.getSHA1(wxGzhConfig.getAppToken(), timestamp, nonce, "");
-        if (signature.equals(shaStr)) {
-            return echostr;
-        }
-        return "unknown";
-    }
-
-    @PostMapping(value = "wxCallback", produces = "application/xml;charset=UTF-8")
-    public String callback(
-            @RequestBody String requestBody,
-            @RequestParam("signature") String signature,
-            @RequestParam("timestamp") String timestamp,
-            @RequestParam("nonce") String nonce,
-            @RequestParam(value = "msg_signature", required = false) String msgSignature) {
-        log.info("接收到微信消息：requestBody：{}", requestBody);
-        Map<String, String> messageMap = MessageUtil.parseXml(requestBody);
-        String msgType = messageMap.get("MsgType");
-        String event = messageMap.get("Event") == null ? "" : messageMap.get("Event");
-        log.info("msgType:{},event:{}", msgType, event);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(msgType);
-        if (!StringUtils.isEmpty(event)) {
-            sb.append(".");
-            sb.append(event);
-        }
-        String msgTypeKey = sb.toString();
-        WxChatMsgHandler wxChatMsgHandler = wxChatMsgFactory.getHandlerByMsgType(msgTypeKey);
-        if (Objects.isNull(wxChatMsgHandler)) {
-            return "unknown";
-        }
-        String replyContent = wxChatMsgHandler.dealMsg(messageMap);
-        log.info("replyContent:{}", replyContent);
-        return replyContent;
-    }
-
 
     /**
      * 获取当前用户信息

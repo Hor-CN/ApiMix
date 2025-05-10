@@ -1,12 +1,14 @@
 package cn.apimix.controller.system;
 
 import cn.apimix.core.annotation.ResponseResult;
-import cn.apimix.model.dto.system.user.*;
-import cn.apimix.model.entity.Role;
-import cn.apimix.model.entity.User;
-import cn.apimix.model.mapstruct.UserMapping;
-import cn.apimix.model.vo.user.UserInfoResp;
-import cn.apimix.service.impl.*;
+import cn.apimix.user.model.entity.Role;
+import cn.apimix.user.model.entity.User;
+import cn.apimix.user.model.mapstruct.UserMapping;
+import cn.apimix.user.model.resp.user.UserInfoResp;
+import cn.apimix.user.model.req.system.*;
+import cn.apimix.user.service.impl.MenuServiceImpl;
+import cn.apimix.user.service.impl.RoleServiceImpl;
+import cn.apimix.user.service.impl.UserServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
@@ -64,7 +66,7 @@ public class SysUserController {
         }).collect(Collectors.toList());
 
         // 返回结果集
-        return new Page<>(userInfoResp, userPage.getPageNumber(), userPage.getPageSize(), userPage.getTotalPage());
+        return new Page<>(userInfoResp, userPage.getPageNumber(), userPage.getPageSize(), userPage.getTotalRow());
     }
 
     @SaCheckLogin // 登录检验

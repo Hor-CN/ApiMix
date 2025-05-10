@@ -1,13 +1,13 @@
 package cn.apimix.controller.console;
 
+import cn.apimix.api.service.impl.PackageServiceImpl;
+import cn.apimix.api.service.impl.UserPackageServiceImpl;
 import cn.apimix.core.annotation.ResponseResult;
-import cn.apimix.core.model.PageRequest;
 import cn.apimix.model.dto.api.ApiInfoQueryRequest;
 import cn.apimix.model.dto.api.MonitorLineRequest;
 import cn.apimix.model.dto.token.AllocationTokenAddRequest;
 import cn.apimix.model.dto.token.AllocationTokenEditRequest;
 import cn.apimix.model.entity.ApiToken;
-import cn.apimix.model.entity.UserPackage;
 import cn.apimix.model.vo.api.AllocationTokenVO;
 import cn.apimix.model.vo.api.ApiRelationVo;
 import cn.apimix.model.vo.api.ApiStatistics;
@@ -88,16 +88,16 @@ public class DataCenterController {
         return apiLogService.getApiStatisticsByUser(request.getId(), currentUserId, request.getStartTime(), request.getEndTime());
     }
 
-    /**
-     * 获取当前接口的该用户的流量包
-     */
-    @SaCheckLogin
-    @GetMapping("getPackage")
-    public Page<UserPackage> getUserPackageList(@Valid PageRequest request, Long apiId) {
-        // 获取当前用户ID
-        Long userId = StpUtil.getLoginIdAsLong();
-        return packageService.getUserPackageList(request, userId, apiId);
-    }
+//    /**
+//     * 获取当前接口的该用户的流量包
+//     */
+//    @SaCheckLogin
+//    @GetMapping("getPackage")
+//    public Page<UserPackage> getUserPackageList(@Valid PageRequest request, Long apiId) {
+//        // 获取当前用户ID
+//        Long userId = StpUtil.getLoginIdAsLong();
+//        return packageService.getUserPackageList(request, userId, apiId);
+//    }
 
     /**
      * 获取当前接口分配的Token

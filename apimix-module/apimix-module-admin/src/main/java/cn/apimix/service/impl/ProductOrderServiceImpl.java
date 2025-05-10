@@ -4,7 +4,7 @@ import cn.apimix.core.model.PageRequest;
 import cn.apimix.core.pay.AliPay;
 import cn.apimix.core.pay.AlipayTradeStatusEnum;
 import cn.apimix.mapper.ApiInfoMapper;
-import cn.apimix.mapper.PackageMapper;
+//import cn.apimix.mapper.PackageMapper;
 import cn.apimix.mapper.ProductOrderMapper;
 import cn.apimix.model.entity.ApiInfo;
 import cn.apimix.model.entity.Package;
@@ -14,7 +14,7 @@ import cn.apimix.core.pay.PayStatusEnum;
 import cn.apimix.model.enums.PayTypeEnum;
 import cn.apimix.model.vo.ProductOrderVo;
 import cn.apimix.service.ProductOrderService;
-import cn.apimix.service.UserAccountService;
+import cn.apimix.user.service.UserAccountService;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import com.mybatisflex.core.paginate.Page;
@@ -42,8 +42,8 @@ import static cn.apimix.core.pay.PayStatusEnum.*;
 @Service
 public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, ProductOrder> implements ProductOrderService {
 
-    @Resource
-    private PackageMapper packageMapper;
+//    @Resource
+//    private PackageMapper packageMapper;
 
     @Resource
     private ApiInfoMapper apiInfoMapper;
@@ -122,43 +122,43 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
 
     public Page<ProductOrderVo> selectProductOrderByUserId(PageRequest pageRequest, Long userId, Integer type) {
-        Page<ProductOrder> paginate = getMapper().paginate(pageRequest.getPageNumber(), pageRequest.getPageSize(),
-                query().where(ProductOrderTableDef.PRODUCT_ORDER.USER_ID.eq(userId))
-                        .and(ProductOrderTableDef.PRODUCT_ORDER.TYPE.eq(type))
-        );
-
-        Page<ProductOrderVo> pageVo = new Page<>();
-        pageVo.setPageNumber(paginate.getPageNumber());
-        pageVo.setPageSize(paginate.getPageSize());
-        pageVo.setTotalPage(paginate.getTotalPage());
-        pageVo.setTotalRow(paginate.getTotalRow());
-
-        List<ProductOrderVo> productOrderVos = new ArrayList<>();
-        paginate.getRecords().forEach(item -> {
-            ProductOrderVo productOrderVo = ProductOrderVo.builder()
-                    .orderNo(item.getId())
-                    .type(item.getType())
-                    .userId(item.getUserId())
-                    .price(item.getPrice())
-                    .payType(item.getPayType())
-                    .status(item.getStatus())
-                    .count(item.getCount())
-                    .invoice(item.getInvoice())
-                    .createTime(item.getCreateTime())
-                    .expirationTime(item.getExpirationTime())
-                    .build();
-            if (item.getPackageId() != null) {
-                Package aPackage = packageMapper.selectOneById(item.getPackageId());
-                productOrderVo.setPackageInfo(aPackage);
-                ApiInfo apiInfo = apiInfoMapper.selectOneById(aPackage.getApiId());
-                productOrderVo.setProductName(apiInfo.getName());
-            }
-            productOrderVos.add(productOrderVo);
-
-
-        });
-        pageVo.setRecords(productOrderVos);
-        return pageVo;
+//        Page<ProductOrder> paginate = getMapper().paginate(pageRequest.getPageNumber(), pageRequest.getPageSize(),
+//                query().where(ProductOrderTableDef.PRODUCT_ORDER.USER_ID.eq(userId))
+//                        .and(ProductOrderTableDef.PRODUCT_ORDER.TYPE.eq(type))
+//        );
+//
+//        Page<ProductOrderVo> pageVo = new Page<>();
+//        pageVo.setPageNumber(paginate.getPageNumber());
+//        pageVo.setPageSize(paginate.getPageSize());
+//        pageVo.setTotalPage(paginate.getTotalPage());
+//        pageVo.setTotalRow(paginate.getTotalRow());
+//
+//        List<ProductOrderVo> productOrderVos = new ArrayList<>();
+//        paginate.getRecords().forEach(item -> {
+//            ProductOrderVo productOrderVo = ProductOrderVo.builder()
+//                    .orderNo(item.getId())
+//                    .type(item.getType())
+//                    .userId(item.getUserId())
+//                    .price(item.getPrice())
+//                    .payType(item.getPayType())
+//                    .status(item.getStatus())
+//                    .count(item.getCount())
+//                    .invoice(item.getInvoice())
+//                    .createTime(item.getCreateTime())
+//                    .expirationTime(item.getExpirationTime())
+//                    .build();
+//            if (item.getPackageId() != null) {
+//                Package aPackage = packageMapper.selectOneById(item.getPackageId());
+//                productOrderVo.setPackageInfo(aPackage);
+//                ApiInfo apiInfo = apiInfoMapper.selectOneById(aPackage.getApiId());
+//                productOrderVo.setProductName(apiInfo.getName());
+//            }
+//            productOrderVos.add(productOrderVo);
+//
+//
+//        });
+//        pageVo.setRecords(productOrderVos);
+        return null;
     }
 
 

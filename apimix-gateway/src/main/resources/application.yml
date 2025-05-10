@@ -8,8 +8,8 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: backend_router
-          uri: http://127.0.0.1:8091
+        - id: apimix-invoke
+          uri: lb://apimix-invoke
           predicates:
             - Path=/api/**
       globalcors:
@@ -26,13 +26,16 @@ spring:
             allowedHeaders: "*" # 允许在请求中携带的头信息
             allowCredentials: true # 是否允许携带cookie
             maxAge: 360000 # 这次跨域检测的有效期
+    nacos:
+      server-addr: 172.20.0.1:8848
+      discovery:
+        server-addr: 172.20.0.1:8848
 
 dubbo:
   registry:
-    address: nacos://127.0.0.1:8848
+    address: nacos://172.20.0.1:8848
   application:
     name: apimix-consumer
-
 
 logging:
   charset:

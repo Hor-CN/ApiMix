@@ -1,12 +1,12 @@
 package cn.apimix.controller.system;
 
+import cn.apimix.api.service.impl.CategoryServiceImpl;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.model.IdRequest;
 import cn.apimix.model.dto.system.category.SysCategoryAddRequest;
 import cn.apimix.model.dto.system.category.SysCategoryEditRequest;
-import cn.apimix.model.entity.Category;
+//import cn.apimix.model.entity.Category;
 import cn.apimix.model.mapstruct.CategoryMapping;
-import cn.apimix.service.impl.CategoryServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
@@ -32,35 +32,35 @@ public class SysCategoryController {
     private CategoryMapping categoryMapping;
 
 
-    /**
-     * 获取全部分类列表
-     */
-    @GetMapping()
-    public List<Category> getlist() {
-        return categoryService.selectCategoryByList();
-    }
+//    /**
+//     * 获取全部分类列表
+//     */
+//    @GetMapping()
+//    public List<Category> getlist() {
+//        return categoryService.selectCategoryByList();
+//    }
+//
 
-
-    /**
-     * 新增分类
-     */
-    @SaCheckLogin
-    @SaCheckPermission("sys:category:add")
-    @PostMapping("save")
-    public Boolean addCategory(@RequestBody @Valid SysCategoryAddRequest addRequest) {
-        return categoryService.insertCategory(categoryMapping.sysCategoryAddRequestToCategory(addRequest));
-    }
-
-
-    /**
-     * 修改分类
-     */
-    @SaCheckLogin
-    @SaCheckPermission("sys:category:edit")
-    @PostMapping("edit")
-    public Boolean editCategory(@RequestBody SysCategoryEditRequest editRequest) {
-        return categoryService.updateCategory(categoryMapping.sysCategoryEditRequestToCategory(editRequest));
-    }
+//    /**
+//     * 新增分类
+//     */
+//    @SaCheckLogin
+//    @SaCheckPermission("sys:category:add")
+//    @PostMapping("save")
+//    public Boolean addCategory(@RequestBody @Valid SysCategoryAddRequest addRequest) {
+//        return categoryService.insertCategory(categoryMapping.sysCategoryAddRequestToCategory(addRequest));
+//    }
+//
+//
+//    /**
+//     * 修改分类
+//     */
+//    @SaCheckLogin
+//    @SaCheckPermission("sys:category:edit")
+//    @PostMapping("edit")
+//    public Boolean editCategory(@RequestBody SysCategoryEditRequest editRequest) {
+//        return categoryService.updateCategory(categoryMapping.sysCategoryEditRequestToCategory(editRequest));
+//    }
 
 
     /**
@@ -76,9 +76,9 @@ public class SysCategoryController {
     /**
      * 根据通知编号获取详细信息
      */
-    @SaCheckLogin
-    @GetMapping(value = "/{categoryId}")
-    public Category getInfo(@PathVariable Long categoryId) {
-        return categoryService.selectCategoryById(categoryId);
-    }
+//    @SaCheckLogin
+//    @GetMapping(value = "/{categoryId}")
+//    public Category getInfo(@PathVariable Long categoryId) {
+//        return categoryService.selectCategoryById(categoryId);
+//    }
 }

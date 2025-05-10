@@ -1,9 +1,14 @@
 package cn.apimix.controller;
 
+import cn.apimix.api.model.entity.ApiVersion;
+import cn.apimix.api.model.entity.Category;
+import cn.apimix.api.model.req.ApiQueryRequest;
+import cn.apimix.api.model.resp.ApiReleaseResp;
+import cn.apimix.api.service.ApiReleaseService;
+import cn.apimix.api.service.impl.CategoryServiceImpl;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.model.dto.api.ApiInfoQueryRequest;
 import cn.apimix.model.entity.ApiInfo;
-import cn.apimix.model.entity.Category;
 import cn.apimix.model.vo.api.ApiInfoVo;
 import cn.apimix.model.vo.api.ApiItemVo;
 import cn.apimix.service.impl.*;
@@ -26,8 +31,10 @@ import java.util.List;
 @RequestMapping("/api/interface")
 public class ApiController {
 
+//    @Resource
+//    private Apiservice apiService;
     @Resource
-    private ApiServiceImpl apiService;
+    private ApiReleaseService apiReleaseService;
 
     @Resource
     private CategoryServiceImpl categoryService;
@@ -35,27 +42,27 @@ public class ApiController {
 
 
 
-    /**
-     * 获取当前开发者贡献的接口
-     */
-    @SaCheckLogin
-    @GetMapping("count")
-    public Long getUserDevApiByCount() {
-        Long currentUserId = StpUtil.getLoginIdAsLong();
-        return apiService.selectApiBycCount(currentUserId);
-    }
+//    /**
+//     * 获取当前开发者贡献的接口
+//     */
+//    @SaCheckLogin
+//    @GetMapping("count")
+//    public Long getUserDevApiByCount() {
+//        Long currentUserId = StpUtil.getLoginIdAsLong();
+//        return apiService.selectApiBycCount(currentUserId);
+//    }
 
-
-    /**
-     * 根据主键获取详细信息。
-     *
-     * @param apiId 主键
-     * @return 详情
-     */
-    @GetMapping("/{apiId}")
-    public ApiInfoVo getApiInfo(@PathVariable Long apiId) {
-        return apiService.selectApiInfoByApiId(apiId);
-    }
+//
+//    /**
+//     * 根据主键获取详细信息。
+//     *
+//     * @param apiId 主键
+//     * @return 详情
+//     */
+//    @GetMapping("/{apiId}")
+//    public ApiInfoVo getApiInfo(@PathVariable Long apiId) {
+//        return apiService.selectApiInfo(apiId);
+//    }
 
     /**
      * 分页查询所有接口根据分类ID
@@ -64,8 +71,8 @@ public class ApiController {
      * @return 分页对象
      */
     @GetMapping("list")
-    public Page<ApiItemVo> getApiLists(@Valid ApiInfoQueryRequest page, Long categoryId) {
-        return apiService.selectApiItemByCategory(page, categoryId);
+    public Page<ApiReleaseResp> getApiLists(@Valid ApiQueryRequest page, Long categoryId) {
+        return apiReleaseService.selectInterfaceByCategory(page, categoryId);
     }
 
     /**
@@ -76,10 +83,10 @@ public class ApiController {
      */
     @SaCheckLogin
     @GetMapping("getDevApiList")
-    public Page<ApiInfo> getDevApiList(@Valid ApiInfoQueryRequest page) {
+    public Page<ApiReleaseResp> getDevApiList(@Valid ApiQueryRequest page) {
         // 获取当前用户ID
         Long loginId = StpUtil.getLoginIdAsLong();
-        return apiService.selectDevApiInfoByPage(page, loginId);
+        return apiReleaseService.getDevInterfaceByPage(page, loginId);
     }
 
 

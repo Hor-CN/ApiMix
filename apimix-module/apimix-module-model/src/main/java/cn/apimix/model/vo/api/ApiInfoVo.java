@@ -1,6 +1,5 @@
 package cn.apimix.model.vo.api;
 
-import cn.apimix.model.entity.ApiExample;
 import cn.apimix.model.vo.sku.SkuVo;
 import lombok.Builder;
 import lombok.Data;
@@ -66,17 +65,17 @@ public class ApiInfoVo {
     /**
      * 请求参数
      */
-    private RequestParamsVo request;
+    private Object request;
 
     /**
      * 响应参数
      */
-    private ResponseParamsVo response;
+    private Object response;
 
     /**
      * 响应示例
      */
-    private List<ApiExample> result;
+//    private List<ApiExample> result;
 
     /**
      * 套餐

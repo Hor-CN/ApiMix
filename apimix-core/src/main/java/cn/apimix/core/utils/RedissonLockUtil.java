@@ -2,6 +2,7 @@ package cn.apimix.core.utils;
 
 import cn.apimix.common.enums.HttpStatusEnum;
 import cn.apimix.core.exception.HorApiException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -241,6 +242,7 @@ public class RedissonLockUtil {
      * @param httpStatusEnum    错误代码
      * @param errorMessage 错误消息
      */
+    @SneakyThrows
     public void redissonDistributedLocks(String lockName, Runnable runnable, HttpStatusEnum httpStatusEnum, String errorMessage) {
         RLock rLock = redissonClient.getLock(lockName);
         try {
@@ -250,7 +252,7 @@ public class RedissonLockUtil {
                 throw new HorApiException(httpStatusEnum.getCode(), errorMessage);
             }
         } catch (Exception e) {
-            throw new HorApiException(httpStatusEnum);
+            throw e;
         } finally {
             if (rLock.isHeldByCurrentThread()) {
                 log.info("lockName:{},unLockId:{} ", lockName, Thread.currentThread().getId());
@@ -267,6 +269,7 @@ public class RedissonLockUtil {
      * @param httpStatusEnum    错误代码
      * @param errorMessage 错误消息
      */
+    @SneakyThrows
     public void redissonDistributedLocks(String lockName, Runnable runnable, String errorLogTitle, HttpStatusEnum httpStatusEnum, String errorMessage) {
         RLock rLock = redissonClient.getLock(lockName);
         try {
@@ -277,7 +280,7 @@ public class RedissonLockUtil {
             }
         } catch (Exception e) {
             log.error(errorLogTitle, e.getMessage());
-            throw new HorApiException(httpStatusEnum);
+            throw e;
         } finally {
             if (rLock.isHeldByCurrentThread()) {
                 log.info("lockName:{},unLockId:{} ", lockName, Thread.currentThread().getId());
@@ -294,6 +297,7 @@ public class RedissonLockUtil {
      * @param httpStatusEnum    错误代码
      * @param errorMessage 错误消息
      */
+    @SneakyThrows
     public void redissonDistributedLocks(String lockName, Runnable runnable, Runnable logMessage, HttpStatusEnum httpStatusEnum, String errorMessage) {
         RLock rLock = redissonClient.getLock(lockName);
         try {
@@ -304,7 +308,7 @@ public class RedissonLockUtil {
             }
         } catch (Exception e) {
             logMessage.run();
-            throw new HorApiException(httpStatusEnum);
+            throw e;
         } finally {
             if (rLock.isHeldByCurrentThread()) {
                 log.info("lockName:{},unLockId:{} ", lockName, Thread.currentThread().getId());
@@ -376,6 +380,7 @@ public class RedissonLockUtil {
      * @param httpStatusEnum    错误代码
      * @param errorMessage 错误消息
      */
+    @SneakyThrows
     public void redissonDistributedLocks(long waitTime, long leaseTime, TimeUnit unit, String lockName, Runnable runnable, HttpStatusEnum httpStatusEnum, String errorMessage) {
         RLock rLock = redissonClient.getLock(lockName);
         try {
@@ -385,7 +390,7 @@ public class RedissonLockUtil {
                 throw new HorApiException(httpStatusEnum.getCode(), errorMessage);
             }
         } catch (Exception e) {
-            throw new HorApiException(httpStatusEnum);
+            throw e;
         } finally {
             if (rLock.isHeldByCurrentThread()) {
                 log.info("unLock: " + Thread.currentThread().getId());
@@ -404,6 +409,7 @@ public class RedissonLockUtil {
      * @param httpStatusEnum    错误代码
      * @param errorMessage 错误消息
      */
+    @SneakyThrows
     public void redissonDistributedLocks(long time, TimeUnit unit, String lockName, Runnable runnable, HttpStatusEnum httpStatusEnum, String errorMessage) {
         RLock rLock = redissonClient.getLock(lockName);
         try {
@@ -413,7 +419,7 @@ public class RedissonLockUtil {
                 throw new HorApiException(httpStatusEnum.getCode(), errorMessage);
             }
         } catch (Exception e) {
-            throw new HorApiException(httpStatusEnum);
+            throw e;
         } finally {
             if (rLock.isHeldByCurrentThread()) {
                 log.info("unLock: " + Thread.currentThread().getId());

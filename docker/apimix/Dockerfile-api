@@ -8,6 +8,6 @@ VOLUME /app
 WORKDIR /app
 # 复制jar文件到路径
 COPY ./jar/apimix-api-1.0-SNAPSHOT.jar /app/app.jar
-ENTRYPOINT ["java","-jar","app.jar","--spring.profiles.active=dev"]
+ENTRYPOINT ["java","-jar","app.jar"]
 
 EXPOSE 8080

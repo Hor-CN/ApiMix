@@ -1,5 +1,6 @@
 package cn.apimix.controller.console;
 
+import cn.apimix.api.service.ApiReleaseService;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.model.vo.api.ApiStatistics;
 import cn.apimix.model.vo.api.ApiVo;
@@ -9,9 +10,8 @@ import cn.apimix.model.vo.console.analyse.IpVo;
 import cn.apimix.model.vo.console.analyse.MethodVo;
 import cn.apimix.model.vo.console.analyse.PvVo;
 import cn.apimix.model.vo.console.home.StatisticVo;
-import cn.apimix.service.impl.UserAccountServiceImpl;
+import cn.apimix.user.service.impl.UserAccountServiceImpl;
 import cn.apimix.service.impl.ApiLogServiceImpl;
-import cn.apimix.service.impl.ApiServiceImpl;
 import cn.apimix.service.impl.UserApiRelationServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
@@ -36,7 +36,7 @@ public class DashboardController {
 
     private final ApiLogServiceImpl apiLogService;
 
-    private final ApiServiceImpl apiService;
+    private final ApiReleaseService apiReleaseService;
 
     private final UserApiRelationServiceImpl relationService;
 
@@ -53,7 +53,7 @@ public class DashboardController {
         return StatisticVo.builder()
                 .amount(accountService.getAmount(currentUserId).getAmount())
                 .applied(relationService.selectUserApiRelationByCount(currentUserId))
-                .contribute(apiService.selectApiBycCount(currentUserId))
+                .contribute(apiReleaseService.getInterfaceByCount(currentUserId))
                 .build();
     }
 

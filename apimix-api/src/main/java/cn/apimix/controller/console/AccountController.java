@@ -1,17 +1,18 @@
 package cn.apimix.controller.console;
 
+import cn.apimix.audit.service.impl.AuditServiceImpl;
 import cn.apimix.core.annotation.ResponseResult;
 import cn.apimix.core.config.RedisKeyConstants;
 import cn.apimix.core.utils.RedisUtils;
-import cn.apimix.model.dto.user.*;
-import cn.apimix.model.entity.Audit;
-import cn.apimix.model.entity.SocialUser;
-import cn.apimix.model.enums.SocialSourceEnum;
-import cn.apimix.model.vo.user.UserSocialBindResp;
-import cn.apimix.service.SocialUserService;
-import cn.apimix.service.UserService;
-import cn.apimix.service.impl.AuditServiceImpl;
-import cn.apimix.service.impl.CaptchaServiceImpl;
+import cn.apimix.audit.model.entity.Audit;
+import cn.apimix.user.model.entity.SocialUser;
+import cn.apimix.user.enunms.SocialSourceEnum;
+import cn.apimix.user.model.resp.user.AvatarResp;
+import cn.apimix.user.model.resp.user.UserSocialBindResp;
+import cn.apimix.user.model.req.*;
+import cn.apimix.user.service.SocialUserService;
+import cn.apimix.user.service.UserService;
+import cn.apimix.user.service.impl.CaptchaServiceImpl;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.lang.Assert;
@@ -23,7 +24,9 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +51,15 @@ public class AccountController {
     private final SocialUserService socialUserService;
 
     private final AuthRequestFactory authRequestFactory;
+
+
+    @SaCheckLogin
+    @PostMapping("/avatar")
+    public AvatarResp updateAvatar(@NotNull(message = "头像不能为空") MultipartFile avatarFile) {
+        Assert.isFalse(avatarFile.isEmpty(), "头像不能为空");
+        String newAvatar = userService.updateAvatar(avatarFile, StpUtil.getLoginIdAsLong());
+        return AvatarResp.builder().avatar(newAvatar).build();
+    }
 
 
     /**

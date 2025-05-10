@@ -2,8 +2,8 @@ package cn.apimix.controller;
 
 import cn.apimix.common.resp.Result;
 import cn.apimix.core.annotation.ResponseResult;
-import cn.apimix.model.vo.CaptchaResp;
-import cn.apimix.service.impl.CaptchaServiceImpl;
+import cn.apimix.user.model.resp.CaptchaResp;
+import cn.apimix.user.service.impl.CaptchaServiceImpl;
 import cn.hutool.core.lang.RegexPool;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

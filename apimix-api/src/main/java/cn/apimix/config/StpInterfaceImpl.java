@@ -1,7 +1,7 @@
 package cn.apimix.config;
 
-import cn.apimix.service.impl.MenuServiceImpl;
-import cn.apimix.service.impl.RoleServiceImpl;
+import cn.apimix.user.service.impl.MenuServiceImpl;
+import cn.apimix.user.service.impl.RoleServiceImpl;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;

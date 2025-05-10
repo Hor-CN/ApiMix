@@ -6,6 +6,7 @@ import cn.hutool.http.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,10 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @Author: Hor
@@ -29,7 +27,7 @@ import java.util.Objects;
 public class ApiController {
 
     @RequestMapping("/*")
-    public ResponseEntity<Object> invokingApi(@RequestBody RequestParams requestParams) {
+    public ResponseEntity<byte[]> invokingApi(@RequestBody RequestParams requestParams) {
 
         // 请求参数
         Map<String, Object> query = MapUtil.newHashMap();
@@ -39,6 +37,7 @@ public class ApiController {
         Map<String, String> headers = MapUtil.newHashMap();
         requestParams.getHeader().forEach(field -> headers.put(field.getName(), field.getValue().toString()));
         headers.remove("X-APIMix-Token");
+
 
         log.info("请求参数：{}", requestParams);
 
@@ -51,7 +50,7 @@ public class ApiController {
                 Method.valueOf(requestParams.getMethod()),
                 // 请求链接
                 HttpUtil.urlWithForm(requestParams.getUrl(),
-                        query, Charset.defaultCharset(), true)
+                        query, Charset.defaultCharset(), false)
         );
         request.clearHeaders();
         request.addHeaders(headers);
@@ -68,17 +67,27 @@ public class ApiController {
             respHeaders.setLocation(URI.create(header));
         }
 
-        List<String> ig = Collections.singletonList("Content-Encoding");
-        execute.headers().forEach((key, value) -> {
-            if (key != null && !ig.contains(key)) {
-                respHeaders.add(key, String.join(",", value));
+        // 1. 设置Content-Type
+        String contentType = execute.header(Header.CONTENT_TYPE);
+        if (contentType != null) {
+            respHeaders.setContentType(MediaType.parseMediaType(contentType));
+        }
+        // 2. 保留其他重要头信息（过滤掉不需要的）
+        List<String> ignoreHeaders = Arrays.asList("");
+        execute.headers().forEach((key, values) -> {
+            if (key != null
+                    && !ignoreHeaders.contains(key)
+                    && !respHeaders.containsKey(key)) {
+                respHeaders.addAll(key, values);
             }
         });
-        
+        // 3. 直接获取二进制内容
+        byte[] bodyBytes = execute.bodyBytes();
+
         return ResponseEntity
                 .status(HttpStatus.valueOf(status))
                 .headers(respHeaders)
-                .body(execute.body());
+                .body(bodyBytes);
 
     }
 

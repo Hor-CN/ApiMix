@@ -15,6 +15,8 @@ import cn.apimix.model.enums.PayTypeEnum;
 import cn.apimix.model.vo.PayOrderStatusVo;
 import cn.apimix.model.vo.ProductOrderVo;
 import cn.apimix.service.OrderService;
+import cn.apimix.user.service.impl.UserAccountServiceImpl;
+import cn.apimix.user.service.impl.UserServiceImpl;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.json.JSONUtil;
@@ -52,8 +54,8 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     private ProductOrderServiceImpl productOrderService;
 
-    @Resource
-    private PackageServiceImpl packageService;
+//    @Resource
+//    private PackageServiceImpl packageService;
 
     @Resource
     private AliPayAccountConfig aliPayAccountConfig;
@@ -178,12 +180,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createProductOrder(Long userId, Long packageId, Integer count) {
-        String redissonLock = ("createOrder:" + userId).intern();
-        // 分布式锁工具
-        redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
-            // 保存订单
-            packageService.purchasePackage(packageId, userId, count);
-        });
+//        String redissonLock = ("createOrder:" + userId).intern();
+//        // 分布式锁工具
+//        redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
+//            // 保存订单
+//            packageService.purchasePackage(packageId, userId, count);
+//        });
     }
 
     @Override

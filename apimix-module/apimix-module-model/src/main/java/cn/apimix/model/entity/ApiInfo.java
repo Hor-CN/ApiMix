@@ -81,25 +81,25 @@ public class ApiInfo implements Serializable {
      */
     private Boolean isPaid;
 
-    @RelationOneToOne(
-            selfField = "id",
-            targetField = "flowNo",
-            extraCondition = "(type=1)"
-    )
-    private Audit audit;
+//    @RelationOneToOne(
+//            selfField = "id",
+//            targetField = "flowNo",
+//            extraCondition = "(type=1)"
+//    )
+//    private Audit audit;
 
-
-    /**
-     * 分类列表
-     */
-    @RelationOneToMany(
-            joinTable = "category_api",
-            selfField = "id",
-            joinSelfColumn = "api_id",
-            targetField = "id",
-            joinTargetColumn = "category_id"
-    )
-    private List<Category> categories;
+//
+//    /**
+//     * 分类列表
+//     */
+//    @RelationOneToMany(
+//            joinTable = "category_api",
+//            selfField = "id",
+//            joinSelfColumn = "api_id",
+//            targetField = "id",
+//            joinTargetColumn = "category_id"
+//    )
+//    private List<Category> categories;
 
 
     /**
@@ -118,9 +118,8 @@ public class ApiInfo implements Serializable {
      */
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
+    private String version;
+
+    private String versionDescription;
 
 }

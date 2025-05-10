@@ -3,6 +3,7 @@ package cn.apimix.model.vo;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
-public class PayOrderStatusVo {
+public class PayOrderStatusVo implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Integer state;
 

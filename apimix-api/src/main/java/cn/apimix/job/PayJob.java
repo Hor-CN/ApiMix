@@ -1,5 +1,7 @@
 package cn.apimix.job;
 
+import cn.apimix.comment.service.CommentLikeService;
+import cn.apimix.comment.service.CommentService;
 import cn.apimix.core.utils.RedissonLockUtil;
 import cn.apimix.model.entity.ProductOrder;
 import cn.apimix.model.enums.PayTypeEnum;
@@ -27,6 +29,9 @@ public class PayJob {
 
     @Resource
     private ProductOrderServiceImpl productOrderService;
+
+    @Resource
+    private CommentLikeService commentLikeService;
 
     @Resource
     private RedissonLockUtil redissonLockUtil;
@@ -63,10 +68,21 @@ public class PayJob {
             List<Long> collectId = orderList.stream().map(ProductOrder::getId).collect(Collectors.toList());
             boolean removeResult = productOrderService.removeByIds(collectId);
             if (removeResult) {
-                log.info("清除成功");
+                log.info("已关闭的订单清除成功");
             }
         });
     }
 
+    /**
+     * 评论数据持久化 每天凌晨3点赞数据持久化同步数据库
+     */
+    @Scheduled(cron = "* * 3 * * ?")
+    public void saveCommentData() {
+        redissonLockUtil.redissonDistributedLocks("saveCommentData", () -> {
+            if (commentLikeService.syncLike()) {
+                log.info("评论数据同步成功");
+            }
+        });
+    }
 
 }
